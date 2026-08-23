@@ -28,7 +28,7 @@ function App() {
 
         <Route path="/projects" element={<ProjectsBoardPage />} />
 
-        <Route path="/project" element={<ViewProjectPage />} />
+        <Route path="/view-project" element={<ViewProjectPage />} />
 
         <Route path="/my-projects" element={<MyProjectsPage />} />
 
