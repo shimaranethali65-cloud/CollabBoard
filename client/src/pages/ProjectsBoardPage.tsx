@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 function ProjectsBoardPage() {
+  const navigate = useNavigate();
+
   const projects = [
     {
       name: "DonorBridge",
@@ -48,9 +52,9 @@ function ProjectsBoardPage() {
     <>
       <style>{`
 
-        /* ==============================
+        /* =========================
            RESET
-        ============================== */
+        ========================= */
 
         * {
           box-sizing: border-box;
@@ -68,109 +72,211 @@ function ProjectsBoardPage() {
         body {
           font-family: Arial, Helvetica, sans-serif;
           background: #ffffff;
+          color: #333333;
         }
 
 
-        /* ==============================
-           FULL APPLICATION
-        ============================== */
+        /* =========================
+           MAIN PAGE
+        ========================= */
 
         .projects-page {
           width: 100%;
           min-height: 100vh;
+          background: #ffffff;
+        }
+
+
+        /* =========================
+           TOP NAVIGATION BAR
+        ========================= */
+
+        .top-navbar {
+          width: 100%;
+          height: 58px;
+
+          display: flex;
+          align-items: center;
+
+          padding: 0 16px;
+
+          background: #ffffff;
+
+          border-bottom: 2px solid #e5e5e5;
+
+          box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* =========================
+           LOGO
+        ========================= */
+
+        .brand {
+          display: flex;
+          align-items: center;
+
+          gap: 7px;
+
+          min-width: 350px;
+        }
+
+        .logo-icon {
+          width: 36px;
+          height: 36px;
+
+          border: 5px solid #9bd3f1;
+
+          border-radius: 4px;
+
+          position: relative;
+
+          flex-shrink: 0;
+        }
+
+        .logo-icon::after {
+          content: "";
+
+          position: absolute;
+
+          width: 15px;
+          height: 8px;
+
+          border-left: 4px solid #9bd3f1;
+          border-bottom: 4px solid #9bd3f1;
+
+          transform: rotate(-45deg);
+
+          left: 6px;
+          top: 7px;
+        }
+
+        .brand-name {
+          font-size: 22px;
+
+          font-weight: 600;
+
+          color: #222222;
+
+          white-space: nowrap;
+        }
+
+
+        /* =========================
+           NAVIGATION LINKS
+        ========================= */
+
+        .nav-links {
+          flex: 1;
 
           display: flex;
 
-          margin: 0;
-          padding: 0;
+          align-items: center;
 
-          background: #ffffff;
+          justify-content: center;
+
+          gap: 27px;
+        }
+
+        .nav-link {
+          border: none;
+
+          background: transparent;
+
+          color: #111111;
+
+          font-size: 16px;
+
+          padding: 8px 0;
+
+          cursor: pointer;
+
+          white-space: nowrap;
+        }
+
+        .nav-link:hover {
+          color: #6bbce8;
         }
 
 
-        /* ==============================
-           SIDEBAR
-        ============================== */
+        /* =========================
+           PROFILE ICON
+        ========================= */
 
-       .sidebar {
-  width: 183px;
-  min-width: 183px;
-  height: 100vh;
-  background: #dddddd;
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-}
+        .profile-icon {
+          width: 34px;
+          height: 34px;
 
-/* LOGO + NAME */
-.sidebar-logo {
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  padding-left: 10px;
-  margin-bottom: 20px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333333;
-}
+          border-radius: 50%;
 
-/* BLUE LOGO */
-.sidebar-logo img {
-  width: 25px;
-  height: 25px;
-  object-fit: contain;
-}
+          background: #000000;
 
-/* MENU */
-.sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
+          position: relative;
 
-/* MENU BUTTONS */
-.sidebar-button {
-  width: 100%;
-  height: 35px;
-  border: none;
-  border-radius: 6px;
-  background: #c8c4c5;
-  color: #222222;
-  font-size: 16px;
-  cursor: pointer;
-}
+          flex-shrink: 0;
 
-.sidebar-button:hover {
-  background: #bebabb;
-}
+          margin-left: 15px;
+        }
 
-        /* ==============================
+        .profile-icon::before {
+          content: "";
+
+          position: absolute;
+
+          width: 10px;
+          height: 10px;
+
+          background: #ffffff;
+
+          border-radius: 50%;
+
+          top: 7px;
+          left: 12px;
+        }
+
+        .profile-icon::after {
+          content: "";
+
+          position: absolute;
+
+          width: 18px;
+          height: 10px;
+
+          background: #ffffff;
+
+          border-radius: 12px 12px 7px 7px;
+
+          bottom: 6px;
+          left: 8px;
+        }
+
+
+        /* =========================
            MAIN CONTENT
-        ============================== */
+        ========================= */
 
         .main-content {
-          flex: 1;
+          width: 100%;
 
-          min-width: 0;
-          min-height: 100vh;
-
-          padding: 22px 25px 40px 20px;
-
-          background: #ffffff;
+          padding:
+            29px
+            16px
+            50px
+            16px;
         }
 
 
-        /* TITLE */
+        /* =========================
+           PAGE TITLE
+        ========================= */
 
         .page-title {
           margin: 0;
 
-          font-size: 24px;
+          font-size: 27px;
 
-          line-height: 29px;
+          line-height: 34px;
 
           font-weight: 600;
 
@@ -178,55 +284,72 @@ function ProjectsBoardPage() {
         }
 
         .page-subtitle {
-          margin: 2px 0 26px;
+          margin:
+            3px
+            0
+            29px
+            2px;
 
-          font-size: 12px;
+          font-size: 13px;
 
-          line-height: 15px;
+          line-height: 17px;
 
           color: #333333;
         }
 
 
-        /* ==============================
+        /* =========================
            SEARCH
-        ============================== */
+        ========================= */
 
         .search-container {
-          width: 185px;
-          height: 38px;
+          width: 308px;
+          height: 39px;
 
           display: flex;
-          align-items: center;
 
-          margin-bottom: 18px;
+          align-items: center;
 
           background: #ffffff;
 
           border-radius: 4px;
 
           box-shadow:
-            0 5px 9px rgba(0, 0, 0, 0.20);
+            0 6px 10px rgba(0, 0, 0, 0.22);
+
+          margin-bottom: 23px;
         }
 
         .search-icon {
-          margin-left: 10px;
+          width: 28px;
 
-          font-size: 24px;
+          margin-left: 12px;
 
-          color: #aaaaaa;
+          font-size: 29px;
+
+          line-height: 1;
+
+          color: #b5b5b5;
+
+          transform: rotate(-20deg);
         }
 
         .search-input {
-          width: 145px;
-          height: 38px;
+          flex: 1;
+
+          height: 39px;
 
           border: none;
+
           outline: none;
 
-          padding: 0 5px;
+          background: transparent;
 
-          font-size: 16px;
+          padding:
+            0
+            8px;
+
+          font-size: 20px;
 
           color: #555555;
         }
@@ -236,54 +359,61 @@ function ProjectsBoardPage() {
         }
 
 
-        /* ==============================
+        /* =========================
            PROJECT TABLE
-        ============================== */
+        ========================= */
 
         .projects-table {
           width: 100%;
 
-          max-width: 100%;
+          min-height: 430px;
 
-          min-height: 385px;
-
-          padding: 14px 21px 15px;
+          padding:
+            17px
+            25px
+            25px
+            34px;
 
           background: #ffffff;
 
-          border-radius: 3px;
+          border-radius: 2px;
 
           box-shadow:
-            0 5px 10px rgba(0, 0, 0, 0.18);
+            0 5px 11px rgba(0, 0, 0, 0.20);
         }
 
 
-        /* TABLE GRID */
+        /* =========================
+           TABLE GRID
+        ========================= */
 
         .table-header,
         .project-row {
           display: grid;
 
           grid-template-columns:
-            1.6fr
-            1.3fr
-            1fr
-            1fr;
+            1.35fr
+            1.05fr
+            0.85fr
+            0.85fr
+            0.75fr;
 
           align-items: center;
         }
 
 
-        /* HEADER */
+        /* =========================
+           TABLE HEADER
+        ========================= */
 
         .table-header {
-          height: 30px;
+          height: 38px;
 
           margin-bottom: 5px;
         }
 
         .table-header span {
-          font-size: 14px;
+          font-size: 18px;
 
           font-weight: 600;
 
@@ -291,40 +421,44 @@ function ProjectsBoardPage() {
         }
 
 
-        /* ROWS */
+        /* =========================
+           PROJECT ROWS
+        ========================= */
 
         .project-row {
-          height: 41px;
+          height: 45px;
         }
 
         .project-name,
         .project-type,
         .due-date {
-          font-size: 14px;
+          font-size: 18px;
 
           color: #444444;
         }
 
 
-        /* ==============================
+        /* =========================
            PRIORITY
-        ============================== */
+        ========================= */
 
         .priority {
           display: flex;
 
           align-items: center;
 
-          gap: 8px;
+          gap: 12px;
 
-          font-size: 14px;
+          font-size: 18px;
 
           color: #444444;
+
+          white-space: nowrap;
         }
 
         .priority-dot {
-          width: 15px;
-          height: 15px;
+          width: 19px;
+          height: 19px;
 
           border-radius: 50%;
 
@@ -346,82 +480,242 @@ function ProjectsBoardPage() {
         }
 
 
-        /* ==============================
+        /* =========================
            DUE DATE
-        ============================== */
+        ========================= */
 
         .due-date {
           display: flex;
 
           align-items: center;
 
-          gap: 5px;
+          gap: 9px;
 
           white-space: nowrap;
         }
 
         .clock-icon {
-          font-size: 16px;
+          font-size: 20px;
 
-          color: #333333;
+          color: #111111;
+
+          line-height: 1;
+        }
+
+
+        /* =========================
+           VIEW PROJECT BUTTON
+        ========================= */
+
+        .view-project-button {
+          width: 105px;
+
+          height: 32px;
+
+          border: none;
+
+          border-radius: 5px;
+
+          background: #9bd3f1;
+
+          color: #222222;
+
+          font-size: 14px;
+
+          font-weight: 500;
+
+          cursor: pointer;
+
+          transition:
+            background 0.2s ease,
+            transform 0.1s ease;
+        }
+
+        .view-project-button:hover {
+          background: #78c3e9;
+        }
+
+        .view-project-button:active {
+          transform: scale(0.97);
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+          .brand {
+            min-width: 250px;
+          }
+
+          .nav-links {
+            gap: 17px;
+          }
+
+          .nav-link {
+            font-size: 14px;
+          }
+
+          .projects-table {
+            overflow-x: auto;
+          }
+
+          .table-header,
+          .project-row {
+            min-width: 950px;
+          }
+        }
+
+
+        @media (max-width: 700px) {
+
+          .top-navbar {
+            height: auto;
+
+            min-height: 58px;
+
+            flex-wrap: wrap;
+
+            padding: 10px;
+          }
+
+          .brand {
+            flex: 1;
+
+            min-width: auto;
+          }
+
+          .nav-links {
+            order: 3;
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            justify-content: flex-start;
+
+            padding-top: 8px;
+          }
+
+          .profile-icon {
+            margin-left: 10px;
+          }
+
+          .main-content {
+            padding:
+              25px
+              12px;
+          }
+
+          .search-container {
+            width: 100%;
+
+            max-width: 308px;
+          }
+
+          .projects-table {
+            overflow-x: auto;
+          }
+
+          .table-header,
+          .project-row {
+            min-width: 950px;
+          }
         }
 
       `}</style>
 
 
+      {/* =========================
+          PAGE
+      ========================= */}
+
       <div className="projects-page">
 
 
-        {/* ============================
-            SIDEBAR
-        ============================ */}
+        {/* =========================
+            TOP NAVBAR
+        ========================= */}
 
-        <aside className="sidebar">
+        <header className="top-navbar">
 
-          <div className="sidebar-logo">
 
-            <div className="logo-check"></div>
+          {/* LOGO */}
 
-            <span>
+          <div className="brand">
+
+            <div className="logo-icon"></div>
+
+            <span className="brand-name">
               CollabBoard
             </span>
 
           </div>
 
 
-          <div className="sidebar-menu">
+          {/* NAVIGATION */}
 
-            <button className="sidebar-button">
+          <nav className="nav-links">
+
+            <button
+              className="nav-link"
+              onClick={() => navigate("/dashboard")}
+            >
+              Dashboard
+            </button>
+
+            <button
+              className="nav-link"
+              onClick={() => navigate("/projects")}
+            >
               All Projects
             </button>
 
-            <button className="sidebar-button">
+            <button
+              className="nav-link"
+              onClick={() => navigate("/my-projects")}
+            >
               My Projects
             </button>
 
-            <button className="sidebar-button">
+            <button
+              className="nav-link"
+              onClick={() => navigate("/create-project")}
+            >
               Create Project
             </button>
 
-            <button className="sidebar-button">
-              My Status
+            <button
+              className="nav-link"
+              onClick={() => navigate("/project")}
+            >
+              My Project
             </button>
 
-            <button className="sidebar-button">
-              My Account
-            </button>
-
-          </div>
-
-        </aside>
+          </nav>
 
 
-        {/* ============================
+          {/* PROFILE */}
+
+          <div
+            className="profile-icon"
+            onClick={() => navigate("/profile")}
+            style={{ cursor: "pointer" }}
+          ></div>
+
+        </header>
+
+
+        {/* =========================
             MAIN CONTENT
-        ============================ */}
+        ========================= */}
 
         <main className="main-content">
 
+
+          {/* TITLE */}
 
           <h1 className="page-title">
             All Projects
@@ -450,12 +744,14 @@ function ProjectsBoardPage() {
           </div>
 
 
-          {/* PROJECT TABLE */}
+          {/* =========================
+              PROJECT TABLE
+          ========================= */}
 
           <div className="projects-table">
 
 
-            {/* HEADER */}
+            {/* TABLE HEADER */}
 
             <div className="table-header">
 
@@ -475,6 +771,10 @@ function ProjectsBoardPage() {
                 Due Date
               </span>
 
+              <span>
+                Action
+              </span>
+
             </div>
 
 
@@ -487,15 +787,22 @@ function ProjectsBoardPage() {
                 key={project.name}
               >
 
+
+                {/* PROJECT NAME */}
+
                 <span className="project-name">
                   {project.name}
                 </span>
 
 
+                {/* TYPE */}
+
                 <span className="project-type">
                   {project.type}
                 </span>
 
+
+                {/* PRIORITY */}
 
                 <span className="priority">
 
@@ -514,6 +821,8 @@ function ProjectsBoardPage() {
                 </span>
 
 
+                {/* DUE DATE */}
+
                 <span className="due-date">
 
                   <span className="clock-icon">
@@ -524,9 +833,21 @@ function ProjectsBoardPage() {
 
                 </span>
 
+
+                {/* VIEW PROJECT */}
+
+                <button
+                  className="view-project-button"
+                  onClick={() => navigate("/project")}
+                >
+                  View Project
+                </button>
+
+
               </div>
 
             ))}
+
 
           </div>
 
