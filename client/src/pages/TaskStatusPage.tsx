@@ -1,4 +1,5 @@
 import React from "react";
+import NavigationBar from "../components/NavigationBar";
 
 type IconName = "search" | "chevronDown" | "plus" | "calendar" | "clipboard";
 
@@ -160,37 +161,42 @@ function TaskStatusPage() {
     <div
       style={{
         width: "100%",
-        minHeight: "100vh",
+        height: "100vh",
         boxSizing: "border-box",
-        padding: "14px 18px 18px",
+        padding: "24px",
         background: "#F5F8FF",
         fontFamily: "Arial, Helvetica, sans-serif",
         color: "#252525",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
+      <NavigationBar style={{ margin: "-24px -24px 24px", flexShrink: 0 }} />
+
       {/* HEADER */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
-          marginLeft: "8px",
-          marginBottom: "9px",
+          gap: "12px",
+          marginLeft: "4px",
+          marginBottom: "16px",
         }}
       >
         <div
           style={{
-            width: "31px",
-            height: "28px",
+            width: "44px",
+            height: "44px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: "7px",
+            borderRadius: "10px",
             background: "#3B9AE8",
             color: "#10283D",
           }}
         >
-          <PageIcon name="clipboard" size={21} strokeWidth={2.2} />
+          <PageIcon name="clipboard" size={27} strokeWidth={2.2} />
         </div>
 
         <div>
@@ -198,8 +204,8 @@ function TaskStatusPage() {
             style={{
               margin: 0,
               color: "#1887D8",
-              fontSize: "12px",
-              lineHeight: "13px",
+              fontSize: "20px",
+              lineHeight: "24px",
               fontWeight: 700,
             }}
           >
@@ -210,8 +216,8 @@ function TaskStatusPage() {
             style={{
               margin: 0,
               color: "#3D3D3D",
-              fontSize: "9px",
-              lineHeight: "11px",
+              fontSize: "13px",
+              lineHeight: "17px",
               fontWeight: 400,
             }}
           >
@@ -223,12 +229,13 @@ function TaskStatusPage() {
       {/* BOARD */}
       <div
         style={{
-          width: "100%",
-          height: "269px",
-          padding: "9px 9px 8px",
+        width: "100%",
+        flex: 1,
+        minHeight: 0,
+          padding: "16px",
           boxSizing: "border-box",
           background: "#E9F1FF",
-          borderRadius: "15px",
+          borderRadius: "18px",
           boxShadow:
             "0 3px 6px rgba(61,83,112,.10), 0 5px 13px rgba(61,83,112,.10)",
         }}
@@ -236,7 +243,7 @@ function TaskStatusPage() {
         {/* TOOLBAR */}
         <div
           style={{
-            height: "26px",
+            height: "48px",
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
@@ -244,17 +251,17 @@ function TaskStatusPage() {
         >
           <button
             style={{
-              width: "126px",
-              height: "19px",
-              padding: "0 7px",
+              width: "190px",
+              height: "32px",
+              padding: "0 12px",
               display: "flex",
               alignItems: "center",
               gap: "6px",
               border: "1px solid #B9C2CF",
-              borderRadius: "6px",
+              borderRadius: "8px",
               background: "#FFFFFF",
               color: "#666666",
-              fontSize: "8px",
+              fontSize: "12px",
               fontWeight: 400,
               cursor: "pointer",
             }}
@@ -262,8 +269,8 @@ function TaskStatusPage() {
             <span
               style={{
                 position: "relative",
-                width: "11px",
-                height: "8px",
+                width: "15px",
+                height: "11px",
                 display: "inline-block",
                 borderRadius: "2px",
                 background: "#7255FF",
@@ -272,10 +279,10 @@ function TaskStatusPage() {
               <span
                 style={{
                   position: "absolute",
-                  left: "1px",
-                  top: "-2px",
-                  width: "5px",
-                  height: "3px",
+                  left: "2px",
+                  top: "-3px",
+                  width: "7px",
+                  height: "4px",
                   borderRadius: "1px 1px 0 0",
                   background: "#7255FF",
                 }}
@@ -286,7 +293,7 @@ function TaskStatusPage() {
 
             <PageIcon
               name="chevronDown"
-              size={13}
+              size={16}
               strokeWidth={1.8}
               style={{ marginLeft: "auto" }}
             />
@@ -294,20 +301,20 @@ function TaskStatusPage() {
 
           <div
             style={{
-              width: "117px",
-              height: "19px",
-              padding: "0 7px",
+              width: "200px",
+              height: "32px",
+              padding: "0 12px",
               display: "flex",
               alignItems: "center",
               gap: "4px",
               boxSizing: "border-box",
               border: "1px solid #BCC4CF",
-              borderRadius: "10px",
+              borderRadius: "16px",
               background: "#FFFFFF",
               color: "#727272",
             }}
           >
-            <PageIcon name="search" size={14} strokeWidth={1.8} />
+            <PageIcon name="search" size={16} strokeWidth={1.8} />
 
             <input
               placeholder="Search tasks..."
@@ -317,7 +324,7 @@ function TaskStatusPage() {
                 outline: "none",
                 background: "transparent",
                 color: "#444444",
-                fontSize: "8px",
+                fontSize: "12px",
               }}
             />
           </div>
@@ -327,9 +334,11 @@ function TaskStatusPage() {
         <div
           style={{
             height: "222px",
+            flex: 1,
+            minHeight: 0,
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "10px",
+            gap: "16px",
           }}
         >
           {columns.map((column) => {
@@ -342,9 +351,9 @@ function TaskStatusPage() {
                   minWidth: 0,
                   display: "flex",
                   flexDirection: "column",
-                  padding: "5px 6px 7px",
+                  padding: "10px",
                   boxSizing: "border-box",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   background: colors.background,
                   border: colors.border,
                 }}
@@ -352,16 +361,16 @@ function TaskStatusPage() {
                 {/* COLUMN HEADER */}
                 <div
                   style={{
-                    height: "18px",
+                    height: "28px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "0 4px",
+                    padding: "0 6px",
                   }}
                 >
                   <span
                     style={{
-                      fontSize: "9px",
+                      fontSize: "14px",
                       fontWeight: 700,
                       color: "#242424",
                     }}
@@ -371,15 +380,15 @@ function TaskStatusPage() {
 
                   <span
                     style={{
-                      width: "16px",
-                      height: "16px",
+                      width: "26px",
+                      height: "26px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "50%",
                       background: colors.countBackground,
                       color: colors.countColor,
-                      fontSize: "8px",
+                      fontSize: "12px",
                       fontWeight: 700,
                     }}
                   >
@@ -390,23 +399,26 @@ function TaskStatusPage() {
                 {/* TASKS */}
                 <div
                   style={{
+                    flex: 1,
+                    minHeight: 0,
                     display: "flex",
                     flexDirection: "column",
-                    gap: "5px",
-                    marginTop: "2px",
+                    gap: "8px",
+                    marginTop: "8px",
+                    overflowY: "auto",
                   }}
                 >
                   {column.tasks.map((task) => (
                     <div
                       key={task.title}
                       style={{
-                        minHeight: "50px",
-                        padding: "6px 7px",
+                        minHeight: "94px",
+                        padding: "12px",
                         display: "flex",
                         flexDirection: "column",
-                        gap: "2px",
+                        gap: "5px",
                         boxSizing: "border-box",
-                        borderRadius: "5px",
+                        borderRadius: "7px",
                         background: "rgba(255,255,255,.72)",
                         border:
                           "1px solid rgba(172,184,201,.52)",
@@ -414,8 +426,8 @@ function TaskStatusPage() {
                     >
                       <div
                         style={{
-                          fontSize: "8px",
-                          lineHeight: "9px",
+                          fontSize: "13px",
+                          lineHeight: "16px",
                           fontWeight: 700,
                           color: "#292929",
                         }}
@@ -425,8 +437,8 @@ function TaskStatusPage() {
 
                       <div
                         style={{
-                          fontSize: "7px",
-                          lineHeight: "8px",
+                          fontSize: "11px",
+                          lineHeight: "14px",
                           color: "#8B8B8B",
                         }}
                       >
@@ -438,12 +450,12 @@ function TaskStatusPage() {
                           marginTop: "auto",
                           display: "flex",
                           alignItems: "center",
-                          gap: "3px",
-                          fontSize: "7px",
+                          gap: "5px",
+                          fontSize: "11px",
                           color: "#8B8B8B",
                         }}
                       >
-                        <PageIcon name="calendar" size={8} strokeWidth={1.6} />
+                        <PageIcon name="calendar" size={12} strokeWidth={1.6} />
                         <span>{task.date}</span>
                       </div>
                     </div>
@@ -454,21 +466,21 @@ function TaskStatusPage() {
                 <button
                   style={{
                     width: "100%",
-                    height: "18px",
+                    height: "34px",
                     marginTop: "auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "3px",
-                    borderRadius: "4px",
+                    gap: "5px",
+                    borderRadius: "6px",
                     border: `1px solid ${colors.buttonBorder}`,
                     background: "rgba(255,255,255,.38)",
                     color: "#2F95E6",
-                    fontSize: "8px",
+                    fontSize: "12px",
                     cursor: "pointer",
                   }}
                 >
-                  <PageIcon name="plus" size={13} strokeWidth={1.8} />
+                  <PageIcon name="plus" size={16} strokeWidth={1.8} />
                   <span>Add task</span>
                 </button>
               </div>

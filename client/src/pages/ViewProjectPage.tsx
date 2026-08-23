@@ -1,4 +1,6 @@
 import React from "react";
+import NavigationBar from "../components/NavigationBar";
+import smmIcons from "../assets/smm-icons.jpg";
 
 type IconName = "arrowLeft" | "calendar" | "users" | "user" | "userPlus";
 
@@ -88,14 +90,19 @@ function ViewProjectPage() {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "100vh",
+        height: "100vh",
         padding: "12px 28px 18px",
         boxSizing: "border-box",
         background: "#F5F8FF",
         fontFamily: "Arial, Helvetica, sans-serif",
         color: "#252525",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
+      <NavigationBar style={{ margin: "-12px -28px 24px" }} />
+
       {/* BACK */}
       <button
         style={{
@@ -107,7 +114,7 @@ function ViewProjectPage() {
           border: "none",
           background: "transparent",
           color: "#4C4C4C",
-          fontSize: "9px",
+          fontSize: "14px",
           fontWeight: 400,
           cursor: "pointer",
         }}
@@ -120,13 +127,13 @@ function ViewProjectPage() {
       <div
         style={{
           position: "absolute",
-          top: "14px",
+          top: "82px",
           right: "27px",
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+        gap: "12px",
           color: "#1D1D1D",
-          fontSize: "10px",
+        fontSize: "16px",
           fontWeight: 700,
         }}
       >
@@ -134,17 +141,17 @@ function ViewProjectPage() {
 
         <div
           style={{
-            width: "33px",
-            height: "27px",
+            width: "46px",
+            height: "40px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: "8px",
+            borderRadius: "10px",
             background: "#3A9AE8",
             color: "#09243A",
           }}
         >
-          <PageIcon name="users" size={21} strokeWidth={2.3} />
+          <PageIcon name="users" size={26} strokeWidth={2.3} />
         </div>
       </div>
 
@@ -153,12 +160,13 @@ function ViewProjectPage() {
         style={{
           position: "relative",
           width: "100%",
-          height: "258px",
+          flex: 1,
+          minHeight: 0,
           marginTop: "23px",
-          padding: "20px 17px",
+          padding: "32px",
           boxSizing: "border-box",
           overflow: "hidden",
-          borderRadius: "14px",
+          borderRadius: "18px",
           background: "#FFFFFF",
           boxShadow:
             "0 3px 6px rgba(61,83,112,.10), 0 5px 12px rgba(61,83,112,.12)",
@@ -184,8 +192,8 @@ function ViewProjectPage() {
             <h1
               style={{
                 margin: 0,
-                fontSize: "12px",
-                lineHeight: "14px",
+                fontSize: "24px",
+                lineHeight: "30px",
                 fontWeight: 700,
                 color: "#252525",
               }}
@@ -197,13 +205,13 @@ function ViewProjectPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "3px",
+                gap: "6px",
                 color: "#686868",
-                fontSize: "8px",
+                fontSize: "14px",
               }}
             >
               <span style={{ color: "#E53D3D", display: "flex" }}>
-                <PageIcon name="calendar" size={12} strokeWidth={1.8} />
+                <PageIcon name="calendar" size={17} strokeWidth={1.8} />
               </span>
 
               <span>45 Days Left</span>
@@ -213,10 +221,10 @@ function ViewProjectPage() {
           {/* DESCRIPTION */}
           <p
             style={{
-              margin: "7px 0 9px",
+              margin: "14px 0 16px",
               color: "#555555",
-              fontSize: "9px",
-              lineHeight: "13px",
+              fontSize: "16px",
+              lineHeight: "24px",
               fontWeight: 400,
             }}
           >
@@ -231,20 +239,20 @@ function ViewProjectPage() {
           <div
             style={{
               color: "#444444",
-              fontSize: "9px",
-              lineHeight: "14px",
+              fontSize: "16px",
+              lineHeight: "25px",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "12px",
               }}
             >
               <span
                 style={{
-                  width: "62px",
+                  width: "120px",
                   flexShrink: 0,
                 }}
               >
@@ -260,12 +268,12 @@ function ViewProjectPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "12px",
               }}
             >
               <span
                 style={{
-                  width: "62px",
+                  width: "120px",
                   flexShrink: 0,
                 }}
               >
@@ -281,12 +289,12 @@ function ViewProjectPage() {
           {/* REQUIREMENTS */}
           <ul
             style={{
-              margin: "5px 0 0",
+              margin: "14px 0 0",
               padding: 0,
               listStyle: "none",
               color: "#4B4B4B",
-              fontSize: "9px",
-              lineHeight: "14px",
+              fontSize: "16px",
+              lineHeight: "26px",
             }}
           >
             <li
@@ -297,9 +305,9 @@ function ViewProjectPage() {
             >
               <span
                 style={{
-                  marginRight: "5px",
+                  marginRight: "8px",
                   color: "#2F95E7",
-                  fontSize: "10px",
+                  fontSize: "18px",
                   fontWeight: 700,
                 }}
               >
@@ -317,9 +325,9 @@ function ViewProjectPage() {
             >
               <span
                 style={{
-                  marginRight: "5px",
+                  marginRight: "8px",
                   color: "#2F95E7",
-                  fontSize: "10px",
+                  fontSize: "18px",
                   fontWeight: 700,
                 }}
               >
@@ -337,9 +345,9 @@ function ViewProjectPage() {
             >
               <span
                 style={{
-                  marginRight: "5px",
+                  marginRight: "8px",
                   color: "#2F95E7",
-                  fontSize: "10px",
+                  fontSize: "18px",
                   fontWeight: 700,
                 }}
               >
@@ -356,20 +364,20 @@ function ViewProjectPage() {
               position: "absolute",
               left: 0,
               bottom: 0,
-              width: "175px",
+              width: "340px",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "3px",
-                marginBottom: "4px",
+                gap: "6px",
+                marginBottom: "10px",
                 color: "#5E5E5E",
-                fontSize: "7px",
+                fontSize: "13px",
               }}
             >
-              <PageIcon name="user" size={11} strokeWidth={1.8} />
+              <PageIcon name="user" size={16} strokeWidth={1.8} />
 
               <span>5 Members</span>
             </div>
@@ -378,29 +386,29 @@ function ViewProjectPage() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                columnGap: "9px",
-                rowGap: "4px",
+                columnGap: "14px",
+                rowGap: "8px",
               }}
             >
               {members.map((member) => (
                 <div
                   key={member}
                   style={{
-                    height: "14px",
-                    padding: "0 8px",
+                    height: "28px",
+                    padding: "0 12px",
                     display: "flex",
                     alignItems: "center",
-                    gap: "5px",
+                    gap: "8px",
                     boxSizing: "border-box",
-                    borderRadius: "7px",
+                    borderRadius: "14px",
                     background: "#E8EDF3",
                     color: "#505050",
-                    fontSize: "7px",
+                    fontSize: "12px",
                     boxShadow:
                       "0 2px 4px rgba(0,0,0,.08)",
                   }}
                 >
-                  <PageIcon name="user" size={8} strokeWidth={2} />
+                  <PageIcon name="user" size={13} strokeWidth={2} />
 
                   <span>{member}</span>
                 </div>
@@ -413,25 +421,25 @@ function ViewProjectPage() {
             style={{
               position: "absolute",
               right: 0,
-              top: "72px",
-              width: "152px",
+              top: "120px",
+              width: "340px",
               display: "flex",
               flexWrap: "wrap",
               justifyContent: "flex-end",
-              gap: "5px 7px",
+              gap: "10px 12px",
             }}
           >
             {technologies.map((technology) => (
               <span
                 key={technology}
                 style={{
-                  padding: "4px 10px",
-                  borderRadius: "12px",
+                  padding: "7px 15px",
+                  borderRadius: "18px",
                   background: "#DFEAFF",
                   color: "#3C8FDA",
-                  fontSize: "8px",
+                  fontSize: "13px",
                   fontWeight: 600,
-                  lineHeight: "9px",
+                  lineHeight: "16px",
                 }}
               >
                 {technology}
@@ -447,61 +455,78 @@ function ViewProjectPage() {
               bottom: 0,
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "12px",
             }}
           >
             <button
               style={{
-                height: "17px",
-                padding: "0 10px",
+                height: "36px",
+                padding: "0 18px",
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
+                gap: "7px",
                 border: "1px solid #9DC9F0",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 background: "#FFFFFF",
                 color: "#3189D6",
-                fontSize: "8px",
+                fontSize: "13px",
                 fontWeight: 700,
                 cursor: "pointer",
               }}
             >
-              <PageIcon name="users" size={11} strokeWidth={1.9} />
+              <PageIcon name="users" size={17} strokeWidth={1.9} />
               <span>View Members</span>
             </button>
 
             <button
               style={{
-                height: "17px",
-                padding: "0 11px",
+                height: "36px",
+                padding: "0 20px",
                 display: "flex",
                 alignItems: "center",
-                gap: "5px",
+                gap: "8px",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 background: "#3B9BE8",
                 color: "#FFFFFF",
-                fontSize: "8px",
+                fontSize: "13px",
                 fontWeight: 700,
                 cursor: "pointer",
               }}
             >
-              <PageIcon name="userPlus" size={12} strokeWidth={1.9} />
+              <PageIcon name="userPlus" size={17} strokeWidth={1.9} />
               <span>Enroll</span>
             </button>
           </div>
         </div>
 
-        {/* LAPTOP ILLUSTRATION */}
-        <div
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: "60px",
-            width: "93px",
-            height: "75px",
+          {/* LAPTOP ILLUSTRATION */}
+          <img
+            src={smmIcons}
+            alt="Team members collaborating with laptops"
+            style={{
+              position: "absolute",
+              left: "53%",
+              top: "130px",
+              width: "410px",
+              height: "410px",
+              objectFit: "contain",
+              opacity: 0.45,
+              transform: "translateX(-50%)",
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            style={{
+              display: "none",
+              position: "absolute",
+            left: "53%",
+            top: "155px",
+            width: "150px",
+            height: "120px",
             opacity: 0.92,
-            transform: "translateX(-50%) scale(1.72)",
+            transform: "translateX(-50%) scale(2.4)",
             transformOrigin: "center",
             zIndex: 0,
             pointerEvents: "none",
