@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import dashboardImage from "../assets/Landing Page .png";
 
 function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <>
       <style>{`
@@ -320,11 +323,19 @@ function LandingPage() {
 
           <div className="nav-buttons">
 
-            <button className="nav-button">
+            {/* Navigate to Sign Up page */}
+            <button
+              className="nav-button"
+              onClick={() => navigate("/signup")}
+            >
               Sign Up
             </button>
 
-            <button className="nav-button">
+            {/* Navigate to Login page */}
+            <button
+              className="nav-button"
+              onClick={() => navigate("/login")}
+            >
               Login
             </button>
 
