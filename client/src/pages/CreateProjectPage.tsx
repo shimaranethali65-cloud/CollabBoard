@@ -1,6 +1,8 @@
 import { useState, type CSSProperties, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import leftArtwork from "../assets/registerpageleftimg.png";
 import rightArtwork from "../assets/registerpagerightimg.png";
+import { createProject } from "../services/projectService";
 
 const fieldStyle: CSSProperties = {
   width: "100%",
@@ -26,22 +28,53 @@ const labelStyle: CSSProperties = {
 };
 
 function CreateProjectPage() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("To do");
   const [priority, setPriority] = useState("High");
   const [member, setMember] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title.trim()) {
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle) {
       alert("Please enter a project title.");
       return;
     }
 
-    alert("Project created successfully!");
+    if (!trimmedDescription) {
+      alert("Please enter a project description.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        name: trimmedTitle,
+        description: trimmedDescription,
+        status,
+        members: member ? [member] : []
+      };
+
+      await createProject(payload);
+      alert("Project created successfully!");
+      navigate("/projects");
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to create project. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const navigationLink: CSSProperties = {
@@ -286,6 +319,7 @@ function CreateProjectPage() {
                   <option>To do</option>
                   <option>In progress</option>
                   <option>Done</option>
+                  <option>Planning</option>
                 </select>
               </label>
             </div>
@@ -338,19 +372,21 @@ function CreateProjectPage() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 style={{
                   width: 164,
                   height: 30,
                   border: "none",
                   borderRadius: 10,
-                  backgroundColor: "#399be0",
+                  backgroundColor: isSubmitting ? "#7bb9ea" : "#399be0",
                   color: "#ffffff",
                   fontSize: 14,
                   fontWeight: 700,
-                  cursor: "pointer",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                  opacity: isSubmitting ? 0.8 : 1,
                 }}
               >
-                + Create Project
+                {isSubmitting ? "Creating..." : "+ Create Project"}
               </button>
             </div>
           </form>

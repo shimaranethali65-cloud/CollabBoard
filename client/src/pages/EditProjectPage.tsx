@@ -1,6 +1,8 @@
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import leftArtwork from "../assets/registerpageleftimg.png";
 import rightArtwork from "../assets/registerpagerightimg.png";
+import { getProjectById, updateProject } from "../services/projectService";
 
 const fieldStyle: CSSProperties = {
   width: "100%",
@@ -26,22 +28,91 @@ const labelStyle: CSSProperties = {
 };
 
 function EditProjectPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("To do");
   const [priority, setPriority] = useState("High");
   const [member, setMember] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const projectId = Number(params.id ?? new URLSearchParams(location.search).get("id"));
+
+  useEffect(() => {
+    const loadProject = async () => {
+      if (!projectId || Number.isNaN(projectId)) {
+        alert("Project ID is missing.");
+        navigate("/projects");
+        return;
+      }
+
+      try {
+        const project = await getProjectById(projectId);
+        setTitle(project.name);
+        setDescription(project.description);
+        setStatus(project.status);
+        setMember(project.members[0] ?? "");
+      } catch (error) {
+        alert(
+          error instanceof Error
+            ? error.message
+            : "Failed to load project details."
+        );
+        navigate("/projects");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProject();
+  }, [navigate, projectId]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title.trim()) {
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle) {
       alert("Please enter a project title.");
       return;
     }
 
-    alert("Project changes saved successfully!");
+    if (!trimmedDescription) {
+      alert("Please enter a project description.");
+      return;
+    }
+
+    if (!projectId || Number.isNaN(projectId)) {
+      alert("Project ID is missing.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await updateProject(projectId, {
+        name: trimmedTitle,
+        description: trimmedDescription,
+        status,
+        members: member ? [member] : []
+      });
+
+      alert("Project changes saved successfully!");
+      navigate("/projects");
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to update project. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const navigationLink: CSSProperties = {
@@ -240,6 +311,11 @@ function EditProjectPage() {
               backgroundColor: "#eaf1ff",
             }}
           >
+            {isLoading && (
+              <p style={{ margin: "0 0 16px", color: "#374151" }}>
+                Loading project details...
+              </p>
+            )}
             <label style={labelStyle}>
               Project Title
               <input
@@ -293,6 +369,8 @@ function EditProjectPage() {
                   <option>To do</option>
                   <option>In progress</option>
                   <option>Done</option>
+                  <option>In Progress</option>
+                  <option>Planning</option>
                 </select>
               </label>
             </div>
@@ -345,19 +423,22 @@ function EditProjectPage() {
 
               <button
                 type="submit"
+                disabled={isSubmitting || isLoading}
                 style={{
                   width: 164,
                   height: 30,
                   border: "none",
                   borderRadius: 10,
-                  backgroundColor: "#399be0",
+                  backgroundColor:
+                    isSubmitting || isLoading ? "#7bb9ea" : "#399be0",
                   color: "#ffffff",
                   fontSize: 14,
                   fontWeight: 700,
-                  cursor: "pointer",
+                  cursor: isSubmitting || isLoading ? "not-allowed" : "pointer",
+                  opacity: isSubmitting || isLoading ? 0.8 : 1,
                 }}
               >
-                + Save changes
+                {isSubmitting ? "Saving..." : "+ Save changes"}
               </button>
             </div>
           </form>
