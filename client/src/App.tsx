@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -15,44 +15,41 @@ import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      {/* Landing Page */}
+      <Route path="/" element={<LandingPage />} />
 
-        <Route path="/" element={<LandingPage />} />
+      {/* Authentication */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/login" element={<LoginPage />} />
+      {/* Dashboard */}
+      <Route path="/dashboard" element={<DashboardPage />} />
 
-        <Route path="/register" element={<RegisterPage />} />
+      {/* Projects */}
+      <Route path="/projects" element={<ProjectsBoardPage />} />
+      <Route path="/view-project" element={<ViewProjectPage />} />
+      <Route path="/my-projects" element={<MyProjectsPage />} />
+      <Route path="/task-status" element={<TaskStatusPage />} />
 
-        <Route path="/dashboard" element={<DashboardPage />} />
+      <Route
+        path="/project-members"
+        element={<ViewProjectMembersPage />}
+      />
 
-        <Route path="/projects" element={<ProjectsBoardPage />} />
+      <Route
+        path="/create-project"
+        element={<CreateProjectPage />}
+      />
 
-        <Route path="/view-project" element={<ViewProjectPage />} />
+      <Route
+        path="/edit-project"
+        element={<EditProjectPage />}
+      />
 
-        <Route path="/my-projects" element={<MyProjectsPage />} />
-
-        <Route path="/task-status" element={<TaskStatusPage />} />
-
-        <Route
-          path="/project-members"
-          element={<ViewProjectMembersPage />}
-        />
-
-        <Route
-          path="/create-project"
-          element={<CreateProjectPage />}
-        />
-
-        <Route
-          path="/edit-project"
-          element={<EditProjectPage />}
-        />
-
-        <Route path="/profile" element={<ProfilePage />} />
-
-      </Routes>
-    </BrowserRouter>
+      {/* Profile */}
+      <Route path="/profile" element={<ProfilePage />} />
+    </Routes>
   );
 }
 
