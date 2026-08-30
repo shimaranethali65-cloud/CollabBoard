@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import NavigationBar from "../components/NavigationBar";
 import smmIcons from "../assets/smm-icons.jpg";
 
-type IconName = "arrowLeft" | "calendar" | "users" | "user" | "userPlus";
+type IconName = "arrowLeft" | "users" | "user" | "userPlus";
 
 function PageIcon({
   name,
@@ -20,12 +21,6 @@ function PageIcon({
       <>
         <path d="M19 12H5" />
         <path d="m12 19-7-7 7-7" />
-      </>
-    ),
-    calendar: (
-      <>
-        <rect x="3" y="5" width="18" height="16" rx="2" />
-        <path d="M7 3v4M17 3v4M3 10h18" />
       </>
     ),
     users: (
@@ -67,24 +62,52 @@ function PageIcon({
   );
 }
 
-const members = [
-  "Sathish",
-  "Alex",
-  "Sarah",
-  "Noah",
-  "John",
-];
-
-const technologies = [
-  "HTML",
-  "CSS",
-  "React",
-  "JavaScript",
-  "Node.js",
-  "MySQL",
-];
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  members: string[];
+}
 
 function ViewProjectPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get("id");
+
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      if (!projectId) {
+        setError("No project selected.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/projects/${projectId}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to load project details");
+        }
+
+        const data = await response.json();
+        setProject(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load project details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [projectId]);
+
+  const members = project?.members ?? [];
+
   return (
     <div
       style={{
@@ -105,6 +128,7 @@ function ViewProjectPage() {
 
       {/* BACK */}
       <button
+        onClick={() => navigate("/projects")}
         style={{
           height: "15px",
           padding: 0,
@@ -123,44 +147,13 @@ function ViewProjectPage() {
         <span>Back to Projects</span>
       </button>
 
-      {/* VIEW PROJECTS */}
-      <div
-        style={{
-          position: "absolute",
-          top: "82px",
-          right: "27px",
-          display: "flex",
-          alignItems: "center",
-        gap: "12px",
-          color: "#1D1D1D",
-        fontSize: "16px",
-          fontWeight: 700,
-        }}
-      >
-        <span>View Projects</span>
-
-        <div
-          style={{
-            width: "46px",
-            height: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "10px",
-            background: "#3A9AE8",
-            color: "#09243A",
-          }}
-        >
-          <PageIcon name="users" size={26} strokeWidth={2.3} />
-        </div>
-      </div>
-
       {/* PROJECT CARD */}
       <section
         style={{
           position: "relative",
           width: "100%",
-          flex: 1,
+          height: "calc(100vh - 190px)",
+          flex: "0 0 auto",
           minHeight: 0,
           marginTop: "23px",
           padding: "32px",
@@ -198,24 +191,8 @@ function ViewProjectPage() {
                 color: "#252525",
               }}
             >
-              Web Development Project
+              {loading ? "Loading Project..." : project?.name ?? "Project Not Found"}
             </h1>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                color: "#686868",
-                fontSize: "14px",
-              }}
-            >
-              <span style={{ color: "#E53D3D", display: "flex" }}>
-                <PageIcon name="calendar" size={17} strokeWidth={1.8} />
-              </span>
-
-              <span>45 Days Left</span>
-            </div>
           </div>
 
           {/* DESCRIPTION */}
@@ -227,12 +204,10 @@ function ViewProjectPage() {
               lineHeight: "24px",
               fontWeight: 400,
             }}
-          >
-            Build a modern web application for university students.
-            <br />
-            This project focuses on creating a web application using modern
-            <br />
-            technologies.
+            >
+            {loading && "Loading project details..."}
+            {!loading && error && error}
+            {!loading && !error && project?.description}
           </p>
 
           {/* PROJECT INFO */}
@@ -261,7 +236,7 @@ function ViewProjectPage() {
 
               <span style={{ marginLeft: "-2px" }}>:</span>
 
-              <span>Group Project</span>
+              <span>{members.length > 1 ? "Group Project" : "Individual Project"}</span>
             </div>
 
             <div
@@ -277,12 +252,12 @@ function ViewProjectPage() {
                   flexShrink: 0,
                 }}
               >
-                Difficulty
+                Status
               </span>
 
               <span style={{ marginLeft: "-2px" }}>:</span>
 
-              <span>Intermediate</span>
+              <span>{project?.status ?? "Not available"}</span>
             </div>
           </div>
 
@@ -379,7 +354,7 @@ function ViewProjectPage() {
             >
               <PageIcon name="user" size={16} strokeWidth={1.8} />
 
-              <span>5 Members</span>
+              <span>{members.length} Members</span>
             </div>
 
             <div
@@ -416,37 +391,6 @@ function ViewProjectPage() {
             </div>
           </div>
 
-          {/* TECHNOLOGY TAGS */}
-          <div
-            style={{
-              position: "absolute",
-              right: 0,
-              top: "120px",
-              width: "340px",
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "flex-end",
-              gap: "10px 12px",
-            }}
-          >
-            {technologies.map((technology) => (
-              <span
-                key={technology}
-                style={{
-                  padding: "7px 15px",
-                  borderRadius: "18px",
-                  background: "#DFEAFF",
-                  color: "#3C8FDA",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  lineHeight: "16px",
-                }}
-              >
-                {technology}
-              </span>
-            ))}
-          </div>
-
           {/* PROJECT ACTIONS */}
           <div
             style={{
@@ -459,6 +403,7 @@ function ViewProjectPage() {
             }}
           >
             <button
+              onClick={() => navigate("/project-members")}
               style={{
                 height: "36px",
                 padding: "0 18px",
@@ -479,6 +424,7 @@ function ViewProjectPage() {
             </button>
 
             <button
+              onClick={() => navigate("/my-projects")}
               style={{
                 height: "36px",
                 padding: "0 20px",

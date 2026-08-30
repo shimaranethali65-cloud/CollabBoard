@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import NavigationBar from "../components/NavigationBar";
 
 type IconName = "search" | "chevronDown" | "plus" | "calendar" | "clipboard";
@@ -55,83 +56,6 @@ function PageIcon({
   );
 }
 
-type Task = {
-  title: string;
-  subtitle: string;
-  date: string;
-};
-
-type Column = {
-  title: string;
-  count: number;
-  type: "todo" | "doing" | "done";
-  tasks: Task[];
-};
-
-const columns: Column[] = [
-  {
-    title: "To Do",
-    count: 3,
-    type: "todo",
-    tasks: [
-      {
-        title: "Design Login Page",
-        subtitle: "Simple Task Management",
-        date: "Oct 24",
-      },
-      {
-        title: "Research APIs",
-        subtitle: "Donor & NGO Dashboard",
-        date: "Nov 14",
-      },
-      {
-        title: "Create Database Schema",
-        subtitle: "Bookstore Inventory System",
-        date: "Nov 29",
-      },
-    ],
-  },
-  {
-    title: "Doing",
-    count: 2,
-    type: "doing",
-    tasks: [
-      {
-        title: "Develop Task Board UI",
-        subtitle: "Simple Task Management",
-        date: "Oct 24",
-      },
-      {
-        title: "Integrate Backend",
-        subtitle: "Donor & NGO Dashboard",
-        date: "Nov 12",
-      },
-    ],
-  },
-  {
-    title: "Done",
-    count: 4,
-    type: "done",
-    tasks: [
-      {
-        title: "Project Proposal",
-        subtitle: "Campus Network Design",
-        date: "Aug 24",
-      },
-      {
-        title: "UI/UX Research",
-        subtitle: "Simple Task Management",
-        date: "July 14",
-      },
-      {
-        title: "Initial Database setup",
-        subtitle: "Bookstore Inventory System",
-        date: "Aug 29",
-      },
-    ],
-  },
-];
-
 const columnStyles = {
   todo: {
     background: "#E0EDFF",
@@ -156,7 +80,66 @@ const columnStyles = {
   },
 };
 
+// Define what a Task looks like coming from your database
+interface BackendTask {
+  _id: string;
+  title: string;
+  description: string;
+  status: "To Do" | "Doing" | "Done";
+  createdAt: string;
+}
+
 function TaskStatusPage() {
+  // Grab the projectId from the URL (e.g., /task-status/:projectId)
+  const { projectId } = useParams<{ projectId: string }>();
+  
+  const [tasks, setTasks] = useState<BackendTask[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch tasks when the component mounts
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/tasks/${projectId}`);
+        if (!response.ok) throw new Error("Failed to fetch tasks");
+        
+        const data = await response.json();
+        setTasks(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      fetchTasks();
+    } else {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  // Helper function to format the database date (e.g., "Oct 24")
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  // Dynamically build the columns based on the fetched tasks
+  const todoTasks = tasks.filter((t) => t.status === "To Do");
+  const doingTasks = tasks.filter((t) => t.status === "Doing");
+  const doneTasks = tasks.filter((t) => t.status === "Done");
+
+  const dynamicColumns = [
+    { title: "To Do", count: todoTasks.length, type: "todo" as const, items: todoTasks },
+    { title: "Doing", count: doingTasks.length, type: "doing" as const, items: doingTasks },
+    { title: "Done", count: doneTasks.length, type: "done" as const, items: doneTasks },
+  ];
+
+  if (loading) return <div style={{ padding: "24px" }}>Loading task board...</div>;
+  if (error) return <div style={{ padding: "24px", color: "red" }}>Error: {error}</div>;
+
   return (
     <div
       style={{
@@ -211,7 +194,6 @@ function TaskStatusPage() {
           >
             Task Board
           </h1>
-
           <p
             style={{
               margin: 0,
@@ -229,15 +211,14 @@ function TaskStatusPage() {
       {/* BOARD */}
       <div
         style={{
-        width: "100%",
-        flex: 1,
-        minHeight: 0,
+          width: "100%",
+          flex: 1,
+          minHeight: 0,
           padding: "16px",
           boxSizing: "border-box",
           background: "#E9F1FF",
           borderRadius: "18px",
-          boxShadow:
-            "0 3px 6px rgba(61,83,112,.10), 0 5px 13px rgba(61,83,112,.10)",
+          boxShadow: "0 3px 6px rgba(61,83,112,.10), 0 5px 13px rgba(61,83,112,.10)",
         }}
       >
         {/* TOOLBAR */}
@@ -290,13 +271,7 @@ function TaskStatusPage() {
             </span>
 
             <span>All Projects</span>
-
-            <PageIcon
-              name="chevronDown"
-              size={16}
-              strokeWidth={1.8}
-              style={{ marginLeft: "auto" }}
-            />
+            <PageIcon name="chevronDown" size={16} strokeWidth={1.8} style={{ marginLeft: "auto" }} />
           </button>
 
           <div
@@ -315,7 +290,6 @@ function TaskStatusPage() {
             }}
           >
             <PageIcon name="search" size={16} strokeWidth={1.8} />
-
             <input
               placeholder="Search tasks..."
               style={{
@@ -341,7 +315,7 @@ function TaskStatusPage() {
             gap: "16px",
           }}
         >
-          {columns.map((column) => {
+          {dynamicColumns.map((column) => {
             const colors = columnStyles[column.type];
 
             return (
@@ -408,9 +382,9 @@ function TaskStatusPage() {
                     overflowY: "auto",
                   }}
                 >
-                  {column.tasks.map((task) => (
+                  {column.items.map((task) => (
                     <div
-                      key={task.title}
+                      key={task._id}
                       style={{
                         minHeight: "94px",
                         padding: "12px",
@@ -420,8 +394,7 @@ function TaskStatusPage() {
                         boxSizing: "border-box",
                         borderRadius: "7px",
                         background: "rgba(255,255,255,.72)",
-                        border:
-                          "1px solid rgba(172,184,201,.52)",
+                        border: "1px solid rgba(172,184,201,.52)",
                       }}
                     >
                       <div
@@ -442,7 +415,7 @@ function TaskStatusPage() {
                           color: "#8B8B8B",
                         }}
                       >
-                        {task.subtitle}
+                        {task.description}
                       </div>
 
                       <div
@@ -456,13 +429,13 @@ function TaskStatusPage() {
                         }}
                       >
                         <PageIcon name="calendar" size={12} strokeWidth={1.6} />
-                        <span>{task.date}</span>
+                        <span>{formatDate(task.createdAt)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* ADD TASK */}
+                {/* ADD TASK BUTTON */}
                 <button
                   style={{
                     width: "100%",
