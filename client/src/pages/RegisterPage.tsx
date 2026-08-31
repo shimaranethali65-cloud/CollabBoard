@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import leftImage from "../assets/registerpageleftimg.png";
 import rightImage from "../assets/registerpagerightimg.png";
@@ -6,6 +7,28 @@ import rightImage from "../assets/registerpagerightimg.png";
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleCreateAccount = () => {
+    if (!fullName.trim() || !username.trim() || !email.trim() || !password || !confirmPassword) {
+      setError("Please complete all fields.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setError("");
+    navigate("/dashboard");
+  };
 
   return (
     <>
@@ -301,6 +324,14 @@ function RegisterPage() {
           display: flex;
           align-items: center;
           justify-content: center;
+          z-index: 4;
+        }
+
+        .register-error {
+          margin: -12px 0 14px;
+          color: #c62828;
+          font-size: 12px;
+          font-weight: 600;
         }
 
         .password-toggle svg {
@@ -776,6 +807,11 @@ function RegisterPage() {
                   className="form-input"
                   placeholder="Enter your full name"
                   autoComplete="name"
+                  value={fullName}
+                  onChange={(event) => {
+                    setFullName(event.target.value);
+                    setError("");
+                  }}
                 />
 
               </div>
@@ -821,6 +857,11 @@ function RegisterPage() {
                   className="form-input"
                   placeholder="Enter username"
                   autoComplete="username"
+                  value={username}
+                  onChange={(event) => {
+                    setUsername(event.target.value);
+                    setError("");
+                  }}
                 />
 
               </div>
@@ -871,6 +912,11 @@ function RegisterPage() {
                 className="form-input"
                 placeholder="Enter your email address"
                 autoComplete="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setError("");
+                }}
               />
 
             </div>
@@ -921,6 +967,11 @@ function RegisterPage() {
                   className="form-input"
                   placeholder="Create a password"
                   autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError("");
+                  }}
                 />
 
                 <button
@@ -1007,6 +1058,11 @@ function RegisterPage() {
                   className="form-input"
                   placeholder="Confirm your password"
                   autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setError("");
+                  }}
                 />
 
                 <button
@@ -1090,9 +1146,12 @@ function RegisterPage() {
 
           {/* CREATE ACCOUNT BUTTON */}
 
+          {error && <p className="register-error">{error}</p>}
+
           <button
             type="button"
             className="create-button"
+            onClick={handleCreateAccount}
           >
 
             <svg
