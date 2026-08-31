@@ -63,11 +63,15 @@ function PageIcon({
 }
 
 interface Project {
-  id: number;
+  id: string;
   name: string;
   description: string;
   status: string;
-  members: string[];
+  members: {
+    name: string;
+    email?: string;
+    role?: string;
+  }[];
 }
 
 function ViewProjectPage() {
@@ -365,9 +369,9 @@ function ViewProjectPage() {
                 rowGap: "8px",
               }}
             >
-              {members.map((member) => (
+              {members.map((member, index) => (
                 <div
-                  key={member}
+                  key={`${member.email || member.name}-${index}`}
                   style={{
                     height: "28px",
                     padding: "0 12px",
@@ -385,7 +389,7 @@ function ViewProjectPage() {
                 >
                   <PageIcon name="user" size={13} strokeWidth={2} />
 
-                  <span>{member}</span>
+                  <span>{member.name}</span>
                 </div>
               ))}
             </div>

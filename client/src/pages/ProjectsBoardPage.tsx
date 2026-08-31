@@ -1,61 +1,78 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+interface ProjectMember {
+  name: string;
+  email?: string;
+  role?: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status?: string;
+  members?: ProjectMember[];
+}
 
 function ProjectsBoardPage() {
   const navigate = useNavigate();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const projects = [
-    {
-      name: "DonorBridge",
-      type: "Web Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "FixFinder",
-      type: "Mobile Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BlindMatch",
-      type: "Web Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "CollabBoard",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "LecturerFinder",
-      type: "Mobile Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "UMS",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BloodDonate",
-      type: "Mobile Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/projects");
+
+        if (!response.ok) {
+          throw new Error("Failed to load projects");
+        }
+
+        const data = await response.json();
+        setProjects(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const filteredProjects = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    if (!query) {
+      return projects;
+    }
+
+    return projects.filter((project) =>
+      [
+        project.name,
+        project.description,
+        project.status,
+        ...(project.members?.map((member) => member.name) ?? []),
+      ]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(query))
+    );
+  }, [projects, searchTerm]);
+
+  const getMemberNames = (project: Project) => {
+    const names = (project.members ?? [])
+      .map((member) => member.name)
+      .filter((name) => name && name !== "Project Manager");
+
+    return names.length > 0 ? names.join(", ") : "No members";
+  };
 
   return (
     <>
       <style>{`
-
-        /* =========================
-           RESET
-        ========================= */
-
         * {
           box-sizing: border-box;
         }
@@ -75,282 +92,161 @@ function ProjectsBoardPage() {
           color: #333333;
         }
 
-
-        /* =========================
-           MAIN PAGE
-        ========================= */
-
         .projects-page {
           width: 100%;
           min-height: 100vh;
           background: #ffffff;
         }
 
-
-        /* =========================
-           TOP NAVIGATION BAR
-        ========================= */
-
         .top-navbar {
           width: 100%;
           height: 58px;
-
           display: flex;
           align-items: center;
-
           padding: 0 16px;
-
           background: #ffffff;
-
           border-bottom: 2px solid #e5e5e5;
-
-          box-shadow:
-            0 1px 3px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
-
-
-        /* =========================
-           LOGO
-        ========================= */
 
         .brand {
           display: flex;
           align-items: center;
-
           gap: 7px;
-
           min-width: 350px;
         }
 
         .logo-icon {
           width: 36px;
           height: 36px;
-
           border: 5px solid #9bd3f1;
-
           border-radius: 4px;
-
           position: relative;
-
           flex-shrink: 0;
         }
 
         .logo-icon::after {
           content: "";
-
           position: absolute;
-
           width: 15px;
           height: 8px;
-
           border-left: 4px solid #9bd3f1;
           border-bottom: 4px solid #9bd3f1;
-
           transform: rotate(-45deg);
-
           left: 6px;
           top: 7px;
         }
 
         .brand-name {
           font-size: 22px;
-
           font-weight: 600;
-
           color: #222222;
-
           white-space: nowrap;
         }
 
-
-        /* =========================
-           NAVIGATION LINKS
-        ========================= */
-
         .nav-links {
           flex: 1;
-
           display: flex;
-
           align-items: center;
-
           justify-content: center;
-
           gap: 27px;
         }
 
         .nav-link {
           border: none;
-
           background: transparent;
-
           color: #111111;
-
           font-size: 16px;
-
           padding: 8px 0;
-
           cursor: pointer;
-
           white-space: nowrap;
         }
 
+        .nav-link.active,
         .nav-link:hover {
           color: #6bbce8;
         }
 
-
-        /* =========================
-           PROFILE ICON
-        ========================= */
-
         .profile-icon {
           width: 34px;
           height: 34px;
-
           border-radius: 50%;
-
           background: #000000;
-
           position: relative;
-
           flex-shrink: 0;
-
           margin-left: 15px;
         }
 
         .profile-icon::before {
           content: "";
-
           position: absolute;
-
           width: 10px;
           height: 10px;
-
           background: #ffffff;
-
           border-radius: 50%;
-
           top: 7px;
           left: 12px;
         }
 
         .profile-icon::after {
           content: "";
-
           position: absolute;
-
           width: 18px;
           height: 10px;
-
           background: #ffffff;
-
           border-radius: 12px 12px 7px 7px;
-
           bottom: 6px;
           left: 8px;
         }
 
-
-        /* =========================
-           MAIN CONTENT
-        ========================= */
-
         .main-content {
           width: 100%;
-
-          padding:
-            29px
-            16px
-            50px
-            16px;
+          padding: 29px 16px 50px;
         }
-
-
-        /* =========================
-           PAGE TITLE
-        ========================= */
 
         .page-title {
           margin: 0;
-
           font-size: 27px;
-
           line-height: 34px;
-
           font-weight: 600;
-
           color: #333333;
         }
 
         .page-subtitle {
-          margin:
-            3px
-            0
-            29px
-            2px;
-
+          margin: 3px 0 29px 2px;
           font-size: 13px;
-
           line-height: 17px;
-
           color: #333333;
         }
-
-
-        /* =========================
-           SEARCH
-        ========================= */
 
         .search-container {
           width: 308px;
           height: 39px;
-
           display: flex;
-
           align-items: center;
-
           background: #ffffff;
-
           border-radius: 4px;
-
-          box-shadow:
-            0 6px 10px rgba(0, 0, 0, 0.22);
-
+          box-shadow: 0 6px 10px rgba(0, 0, 0, 0.22);
           margin-bottom: 23px;
         }
 
         .search-icon {
           width: 28px;
-
           margin-left: 12px;
-
           font-size: 29px;
-
           line-height: 1;
-
           color: #b5b5b5;
-
           transform: rotate(-20deg);
         }
 
         .search-input {
           flex: 1;
-
           height: 39px;
-
           border: none;
-
           outline: none;
-
           background: transparent;
-
-          padding:
-            0
-            8px;
-
+          padding: 0 8px;
           font-size: 20px;
-
           color: #555555;
         }
 
@@ -358,177 +254,75 @@ function ProjectsBoardPage() {
           color: #999999;
         }
 
-
-        /* =========================
-           PROJECT TABLE
-        ========================= */
-
         .projects-table {
           width: 100%;
-
           min-height: 430px;
-
-          padding:
-            17px
-            25px
-            25px
-            34px;
-
+          padding: 17px 25px 25px 34px;
           background: #ffffff;
-
           border-radius: 2px;
-
-          box-shadow:
-            0 5px 11px rgba(0, 0, 0, 0.20);
+          box-shadow: 0 5px 11px rgba(0, 0, 0, 0.2);
         }
-
-
-        /* =========================
-           TABLE GRID
-        ========================= */
 
         .table-header,
         .project-row {
           display: grid;
-
-          grid-template-columns:
-            1.35fr
-            1.05fr
-            0.85fr
-            0.85fr
-            0.75fr;
-
+          grid-template-columns: 1fr 1.1fr 0.7fr 0.7fr 0.55fr;
           align-items: center;
+          column-gap: 24px;
         }
-
-
-        /* =========================
-           TABLE HEADER
-        ========================= */
 
         .table-header {
           height: 38px;
-
           margin-bottom: 5px;
         }
 
         .table-header span {
           font-size: 18px;
-
           font-weight: 600;
-
           color: #222222;
         }
 
-
-        /* =========================
-           PROJECT ROWS
-        ========================= */
-
         .project-row {
-          height: 45px;
+          min-height: 62px;
+          border-top: 1px solid #eeeeee;
         }
 
         .project-name,
-        .project-type,
-        .due-date {
-          font-size: 18px;
-
+        .project-description,
+        .project-members {
+          font-size: 16px;
           color: #444444;
         }
 
-
-        /* =========================
-           PRIORITY
-        ========================= */
-
-        .priority {
+        .project-status {
           display: flex;
-
           align-items: center;
-
-          gap: 12px;
-
-          font-size: 18px;
-
+          gap: 10px;
+          font-size: 16px;
           color: #444444;
-
           white-space: nowrap;
         }
 
-        .priority-dot {
-          width: 19px;
-          height: 19px;
-
+        .status-dot {
+          width: 13px;
+          height: 13px;
           border-radius: 50%;
-
           display: inline-block;
-
           flex-shrink: 0;
+          background: #9bd3f1;
         }
-
-        .priority-high {
-          background: #74130b;
-        }
-
-        .priority-medium {
-          background: #c94d35;
-        }
-
-        .priority-low {
-          background: #68f33d;
-        }
-
-
-        /* =========================
-           DUE DATE
-        ========================= */
-
-        .due-date {
-          display: flex;
-
-          align-items: center;
-
-          gap: 9px;
-
-          white-space: nowrap;
-        }
-
-        .clock-icon {
-          font-size: 20px;
-
-          color: #111111;
-
-          line-height: 1;
-        }
-
-
-        /* =========================
-           VIEW PROJECT BUTTON
-        ========================= */
 
         .view-project-button {
           width: 105px;
-
           height: 32px;
-
-          border: none;
-
-          border-radius: 5px;
-
-          background: #9bd3f1;
-
+          border-radius: 4px;
           color: #222222;
-
           font-size: 14px;
-
-          font-weight: 500;
-
+          line-height: 16px;
           cursor: pointer;
-
-          transition:
-            background 0.2s ease,
-            transform 0.1s ease;
+          transition: background 0.2s ease, transform 0.1s ease;
+          border: none;
+          background: #9bd3f1;
         }
 
         .view-project-button:hover {
@@ -539,13 +333,7 @@ function ProjectsBoardPage() {
           transform: scale(0.97);
         }
 
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
         @media (max-width: 1100px) {
-
           .brand {
             min-width: 250px;
           }
@@ -568,34 +356,24 @@ function ProjectsBoardPage() {
           }
         }
 
-
         @media (max-width: 700px) {
-
           .top-navbar {
             height: auto;
-
             min-height: 58px;
-
             flex-wrap: wrap;
-
             padding: 10px;
           }
 
           .brand {
             flex: 1;
-
             min-width: auto;
           }
 
           .nav-links {
             order: 3;
-
             width: 100%;
-
             overflow-x: auto;
-
             justify-content: flex-start;
-
             padding-top: 8px;
           }
 
@@ -604,14 +382,11 @@ function ProjectsBoardPage() {
           }
 
           .main-content {
-            padding:
-              25px
-              12px;
+            padding: 25px 12px;
           }
 
           .search-container {
             width: 100%;
-
             max-width: 308px;
           }
 
@@ -624,235 +399,113 @@ function ProjectsBoardPage() {
             min-width: 950px;
           }
         }
-
       `}</style>
 
-
-      {/* =========================
-          PAGE
-      ========================= */}
-
       <div className="projects-page">
-
-
-        {/* =========================
-            TOP NAVBAR
-        ========================= */}
-
         <header className="top-navbar">
-
-
-          {/* LOGO */}
-
           <div className="brand">
-
             <div className="logo-icon"></div>
-
-            <span className="brand-name">
-              CollabBoard
-            </span>
-
+            <span className="brand-name">CollabBoard</span>
           </div>
 
-
-          {/* NAVIGATION */}
-
           <nav className="nav-links">
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/dashboard")}
-            >
+            <button className="nav-link" onClick={() => navigate("/dashboard")}>
               Dashboard
             </button>
 
-            <button
-              className="nav-link"
-              onClick={() => navigate("/projects")}
-            >
+            <button className="nav-link active" onClick={() => navigate("/projects")}>
               All Projects
             </button>
 
-            <button
-              className="nav-link"
-              onClick={() => navigate("/my-projects")}
-            >
+            <button className="nav-link" onClick={() => navigate("/my-projects")}>
               My Projects
             </button>
 
-            <button
-              className="nav-link"
-              onClick={() => navigate("/create-project")}
-            >
+            <button className="nav-link" onClick={() => navigate("/create-project")}>
               Create Project
             </button>
 
-            <button
-              className="nav-link"
-              onClick={() => navigate("/project")}
-            >
+            <button className="nav-link" onClick={() => navigate("/project")}>
               My Project
             </button>
-
           </nav>
-
-
-          {/* PROFILE */}
 
           <div
             className="profile-icon"
             onClick={() => navigate("/profile")}
             style={{ cursor: "pointer" }}
           ></div>
-
         </header>
 
-
-        {/* =========================
-            MAIN CONTENT
-        ========================= */}
-
         <main className="main-content">
+          <h1 className="page-title">All Projects</h1>
 
-
-          {/* TITLE */}
-
-          <h1 className="page-title">
-            All Projects
-          </h1>
-
-
-          <p className="page-subtitle">
-            View and manage All Tasks
-          </p>
-
-
-          {/* SEARCH */}
+          <p className="page-subtitle">View and manage all projects</p>
 
           <div className="search-container">
-
-            <span className="search-icon">
-              ⌕
-            </span>
+            <span className="search-icon">⌕</span>
 
             <input
               type="text"
               className="search-input"
               placeholder="Search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
             />
-
           </div>
-
-
-          {/* =========================
-              PROJECT TABLE
-          ========================= */}
 
           <div className="projects-table">
-
-
-            {/* TABLE HEADER */}
-
             <div className="table-header">
-
-              <span>
-                Project
-              </span>
-
-              <span>
-                Type
-              </span>
-
-              <span>
-                Priority
-              </span>
-
-              <span>
-                Due Date
-              </span>
-
-              <span>
-                Action
-              </span>
-
+              <span>Project</span>
+              <span>Description</span>
+              <span>Status</span>
+              <span>Members</span>
+              <span>Action</span>
             </div>
 
+            {loading && (
+              <div className="project-row">
+                <span className="project-name">Loading projects...</span>
+              </div>
+            )}
 
-            {/* PROJECTS */}
+            {!loading && error && (
+              <div className="project-row">
+                <span className="project-name">{error}</span>
+              </div>
+            )}
 
-            {projects.map((project) => (
+            {!loading && !error && filteredProjects.length === 0 && (
+              <div className="project-row">
+                <span className="project-name">No projects found</span>
+              </div>
+            )}
 
-              <div
-                className="project-row"
-                key={project.name}
-              >
+            {!loading &&
+              !error &&
+              filteredProjects.map((project) => (
+                <div className="project-row" key={project.id}>
+                  <span className="project-name">{project.name}</span>
 
+                  <span className="project-description">{project.description}</span>
 
-                {/* PROJECT NAME */}
-
-                <span className="project-name">
-                  {project.name}
-                </span>
-
-
-                {/* TYPE */}
-
-                <span className="project-type">
-                  {project.type}
-                </span>
-
-
-                {/* PRIORITY */}
-
-                <span className="priority">
-
-                  <span
-                    className={`priority-dot ${
-                      project.priority === "High"
-                        ? "priority-high"
-                        : project.priority === "Medium"
-                        ? "priority-medium"
-                        : "priority-low"
-                    }`}
-                  />
-
-                  {project.priority}
-
-                </span>
-
-
-                {/* DUE DATE */}
-
-                <span className="due-date">
-
-                  <span className="clock-icon">
-                    ◷
+                  <span className="project-status">
+                    <span className="status-dot" />
+                    {project.status || "Not set"}
                   </span>
 
-                  {project.dueDate}
+                  <span className="project-members">{getMemberNames(project)}</span>
 
-                </span>
-
-
-                {/* VIEW PROJECT */}
-
-                <button
-                  className="view-project-button"
-                  onClick={() => navigate("/project")}
-                >
-                  View Project
-                </button>
-
-
-              </div>
-
-            ))}
-
-
+                  <button
+                    className="view-project-button"
+                    onClick={() => navigate(`/project?id=${project.id}`)}
+                  >
+                    View Project
+                  </button>
+                </div>
+              ))}
           </div>
-
         </main>
-
       </div>
     </>
   );
