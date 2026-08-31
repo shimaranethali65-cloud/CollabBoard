@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="login-page">
@@ -334,6 +336,12 @@ function LoginPage() {
         .signup-link {
           margin-left: 8px;
 
+          padding: 0;
+          border: none;
+          background: transparent;
+
+          font: inherit;
+
           color: #007cff;
 
           cursor: pointer;
@@ -653,6 +661,7 @@ function LoginPage() {
         <button
           type="button"
           className="login-button"
+          onClick={() => navigate("/dashboard")}
         >
           <span className="login-button-icon">
             ⇥
@@ -666,9 +675,13 @@ function LoginPage() {
         <div className="signup-text">
           Don’t have an account?
 
-          <span className="signup-link">
+          <button
+            type="button"
+            className="signup-link"
+            onClick={() => navigate("/register")}
+          >
             Sign up
-          </span>
+          </button>
         </div>
 
       </div>
