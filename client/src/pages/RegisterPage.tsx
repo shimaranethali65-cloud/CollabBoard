@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import leftImage from "../assets/registerpageleftimg.png";
 import rightImage from "../assets/registerpagerightimg.png";
@@ -13,11 +14,36 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const handleCreateAccount = () => {
-    if (!fullName.trim() || !username.trim() || !email.trim() || !password || !confirmPassword) {
-      setError("Please complete all fields.");
+  const handleCreateAccount = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    const trimmedUsername = username.trim().toLowerCase();
+    if (!trimmedUsername) {
+      setError("Please enter a username.");
+      return;
+    }
+
+    if (trimmedUsername.length < 3) {
+      setError("Username must be at least 3 characters.");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_.-]+$/.test(trimmedUsername)) {
+      setError("Username can only contain letters, numbers, hyphens, dots, or underscores.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter a password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
 
@@ -26,8 +52,26 @@ function RegisterPage() {
       return;
     }
 
-    setError("");
-    navigate("/dashboard");
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+      await register({
+        name: fullName.trim() || undefined,
+        username: trimmedUsername,
+        email: email.trim() || undefined,
+        password
+      });
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,7 +105,11 @@ function RegisterPage() {
           width: 100%;
           min-height: 100vh;
           background: #ffffff;
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
 
         /* =========================================
@@ -71,15 +119,11 @@ function RegisterPage() {
         .register-header {
           position: relative;
           z-index: 5;
-
           display: flex;
           align-items: center;
-
-          width: fit-content;
-
-          margin-left: 50px;
-          padding-top: 28px;
-
+          width: 700px;
+          max-width: calc(100% - 40px);
+          margin: 32px auto 0;
           gap: 18px;
         }
 
@@ -175,36 +219,16 @@ function RegisterPage() {
         ========================================= */
 
         .register-card {
-          position: absolute;
-
+          position: relative;
           z-index: 4;
-
-          /*
-             THIS CENTERS THE CARD
-          */
-          left: 50%;
-          transform: translateX(-50%);
-
-          /*
-             POSITION BELOW HEADER
-          */
-          top: 250px;
-
-          /*
-             LARGER SIZE
-          */
           width: 620px;
-
+          max-width: calc(100% - 32px);
+          margin: 28px auto 40px;
           min-height: 365px;
-
-          padding: 22px 28px 30px;
-
+          padding: 24px 28px 30px;
           background: #edf4ff;
-
           border-radius: 12px;
-
-          box-shadow:
-            0 8px 22px rgba(0, 0, 0, 0.16);
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
         }
 
         /* =========================================
@@ -459,37 +483,19 @@ function RegisterPage() {
 
         @media (max-width: 1000px) {
           .register-header {
-            margin-left: 30px;
+            width: calc(100% - 40px);
+            margin: 24px auto 0;
           }
 
           .register-card {
-  position: absolute;
-  z-index: 4;
-
-  left: 50%;
-  transform: translateX(-50%);
-
-  top: 250px;
-
-  width: 700px;
-  min-height: 400px;
-
-  padding: 28px 34px 34px;
-
-  background: #edf4ff;
-
-  border-radius: 12px;
-
-  box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.16);
-}
-
-          .register-left-image {
-            width: 90px;
+            width: 620px;
+            max-width: calc(100% - 32px);
+            margin: 24px auto 32px;
           }
 
+          .register-left-image,
           .register-right-image {
-            width: 120px;
+            display: none !important;
           }
         }
 
@@ -764,6 +770,7 @@ function RegisterPage() {
         ========================================= */}
 
         <div className="register-card">
+          <form onSubmit={handleCreateAccount}>
 
           {/* FULL NAME + USERNAME */}
 
@@ -1149,16 +1156,15 @@ function RegisterPage() {
           {error && <p className="register-error">{error}</p>}
 
           <button
-            type="button"
+            type="submit"
             className="create-button"
-            onClick={handleCreateAccount}
+            disabled={loading}
+            style={loading ? { opacity: 0.7, cursor: "not-allowed" } : undefined}
           >
-
             <svg
               viewBox="0 0 24 24"
               fill="none"
             >
-
               <circle
                 cx="9"
                 cy="8"
@@ -1166,35 +1172,48 @@ function RegisterPage() {
                 stroke="white"
                 strokeWidth="1.5"
               />
-
               <path
                 d="M3 20C3.7 16.7 5.7 15 9 15C12.3 15 14.3 16.7 15 20"
                 stroke="white"
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
-
               <path
                 d="M18 13V19"
                 stroke="white"
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
-
               <path
                 d="M15 16H21"
                 stroke="white"
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
-
             </svg>
-
-            Create Account
-
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
-        </div>
+          <div style={{ marginTop: 18, textAlign: "center", fontSize: 13, color: "#333" }}>
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#0066cc",
+                fontWeight: 600,
+                cursor: "pointer",
+                padding: 0,
+                fontSize: 13
+              }}
+            >
+              Log in
+            </button>
+          </div>
+        </form>
+      </div>
 
       </div>
     </>

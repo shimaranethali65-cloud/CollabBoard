@@ -1,10 +1,42 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!usernameOrEmail.trim()) {
+      setError("Please enter your username or email");
+      return;
+    }
+    if (!password) {
+      setError("Please enter your password");
+      return;
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+      await login(usernameOrEmail.trim(), password);
+      const destination = (location.state as { from?: string })?.from || "/dashboard";
+      navigate(destination);
+    } catch (err: any) {
+      setError(err.message || "Failed to login. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-page">
@@ -37,7 +69,8 @@ function LoginPage() {
           width: 100%;
           min-height: 100vh;
           background: #ffffff;
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -50,7 +83,7 @@ function LoginPage() {
         .login-header {
           width: 700px;
           max-width: calc(100% - 40px);
-          margin-top: 68px;
+          margin-top: 48px;
 
           display: flex;
           align-items: center;
@@ -111,15 +144,17 @@ function LoginPage() {
 
         .login-card {
           width: 438px;
+          max-width: calc(100% - 32px);
           min-height: 378px;
 
-          margin-top: 42px;
+          margin-top: 36px;
+          margin-bottom: 40px;
 
           padding: 25px 29px 25px;
 
           background: #eaf2ff;
 
-          border-radius: 2px;
+          border-radius: 6px;
 
           box-shadow:
             0 8px 18px rgba(0, 0, 0, 0.18);
@@ -313,9 +348,27 @@ function LoginPage() {
           transform: translateY(0);
         }
 
+        .login-button:disabled {
+          background: #b0d2e8;
+          cursor: not-allowed;
+          transform: none;
+        }
+
         .login-button-icon {
           font-size: 22px;
           margin-right: 12px;
+        }
+
+        .login-error {
+          background: #ffebee;
+          color: #c62828;
+          border: 1px solid #ffcdd2;
+          border-radius: 6px;
+          padding: 8px 12px;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 18px;
+          text-align: center;
         }
 
         /* =========================
@@ -575,103 +628,112 @@ function LoginPage() {
       ========================= */}
 
       <div className="login-card">
+        <form onSubmit={handleLogin}>
+          {error && <div className="login-error">{error}</div>}
 
-        {/* EMAIL */}
+          {/* USERNAME OR EMAIL */}
+          <div className="form-group">
+            <div className="form-label-row">
+              <label className="form-label" htmlFor="usernameOrEmail">
+                Username or Email
+              </label>
+            </div>
 
-        <div className="form-group">
-          <div className="form-label-row">
-            <label className="form-label">
-              Email Address
+            <div className="input-wrapper">
+              <span className="input-icon">
+                👤
+              </span>
+
+              <input
+                id="usernameOrEmail"
+                type="text"
+                placeholder="Enter your username or email"
+                autoComplete="username"
+                value={usernameOrEmail}
+                onChange={(e) => {
+                  setUsernameOrEmail(e.target.value);
+                  if (error) setError("");
+                }}
+              />
+            </div>
+          </div>
+
+          {/* PASSWORD */}
+          <div className="form-group">
+            <div className="form-label-row">
+              <label className="form-label" htmlFor="password">
+                Password
+              </label>
+
+              <button
+                type="button"
+                className="forgot-password"
+                onClick={() => alert("Please contact your administrator to reset your password.")}
+              >
+                Forgot Password?
+              </button>
+            </div>
+
+            <div className="input-wrapper">
+              <span className="input-icon">
+                🔒
+              </span>
+
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError("");
+                }}
+              />
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
+          </div>
+
+          {/* REMEMBER ME */}
+          <div className="remember-row">
+            <input
+              id="remember"
+              type="checkbox"
+              className="remember-checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+
+            <label
+              htmlFor="remember"
+              className="remember-label"
+            >
+              Remember me
             </label>
           </div>
 
-          <div className="input-wrapper">
-            <span className="input-icon">
-              ✉
-            </span>
-
-            <input
-              type="email"
-              placeholder="Enter your email address"
-            />
-          </div>
-        </div>
-
-        {/* PASSWORD */}
-
-        <div className="form-group">
-
-          <div className="form-label-row">
-            <label className="form-label">
-              Password
-            </label>
-
-            <button
-              type="button"
-              className="forgot-password"
-            >
-              Forgot Password?
-            </button>
-          </div>
-
-          <div className="input-wrapper">
-            <span className="input-icon">
-              ♧
-            </span>
-
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-            />
-
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "◉" : "◉"}
-            </button>
-          </div>
-
-        </div>
-
-        {/* REMEMBER ME */}
-
-        <div className="remember-row">
-
-          <input
-            id="remember"
-            type="checkbox"
-            className="remember-checkbox"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-          />
-
-          <label
-            htmlFor="remember"
-            className="remember-label"
+          {/* LOGIN BUTTON */}
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
           >
-            Remember me
-          </label>
-
-        </div>
-
-        {/* LOGIN BUTTON */}
-
-        <button
-          type="button"
-          className="login-button"
-          onClick={() => navigate("/dashboard")}
-        >
-          <span className="login-button-icon">
-            ⇥
-          </span>
-
-          Login
-        </button>
+            <span className="login-button-icon">
+              ⇥
+            </span>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
 
         {/* SIGN UP */}
-
         <div className="signup-text">
           Don’t have an account?
 
