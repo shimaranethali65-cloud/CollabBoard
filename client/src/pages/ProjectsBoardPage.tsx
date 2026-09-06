@@ -1,56 +1,40 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import NavigationBar from "../components/NavigationBar";
+import { getProjects, type Project } from "../services/projectService";
+
 function ProjectsBoardPage() {
-  const projects = [
-    {
-      name: "DonorBridge",
-      type: "Web Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "FixFinder",
-      type: "Mobile Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BlindMatch",
-      type: "Web Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "CollabBoard",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "LecturerFinder",
-      type: "Mobile Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "UMS",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BloodDonate",
-      type: "Mobile Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-  ];
+  const navigate = useNavigate();
+
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (err) {
+        setError("Failed to load projects");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Filter projects based on the search input
+  const filteredProjects = projects.filter((project) =>
+    project.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
       <style>{`
-
-        /* ==============================
-           RESET
-        ============================== */
 
         * {
           box-sizing: border-box;
@@ -68,109 +52,184 @@ function ProjectsBoardPage() {
         body {
           font-family: Arial, Helvetica, sans-serif;
           background: #ffffff;
+          color: #333333;
         }
-
-
-        /* ==============================
-           FULL APPLICATION
-        ============================== */
 
         .projects-page {
           width: 100%;
           min-height: 100vh;
+          background: #ffffff;
+        }
+
+        /* TOP NAVIGATION BAR */
+
+        .top-navbar {
+          width: 100%;
+          height: 58px;
 
           display: flex;
+          align-items: center;
 
-          margin: 0;
-          padding: 0;
+          padding: 0 16px;
 
           background: #ffffff;
+
+          border-bottom: 2px solid #e5e5e5;
+
+          box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
+        /* LOGO */
 
-        /* ==============================
-           SIDEBAR
-        ============================== */
+        .brand {
+          display: flex;
+          align-items: center;
 
-       .sidebar {
-  width: 183px;
-  min-width: 183px;
-  height: 100vh;
-  background: #dddddd;
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-}
+          gap: 7px;
 
-/* LOGO + NAME */
-.sidebar-logo {
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  padding-left: 10px;
-  margin-bottom: 20px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333333;
-}
+          min-width: 350px;
+        }
 
-/* BLUE LOGO */
-.sidebar-logo img {
-  width: 25px;
-  height: 25px;
-  object-fit: contain;
-}
+        .logo-icon {
+          width: 36px;
+          height: 36px;
 
-/* MENU */
-.sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
+          border: 5px solid #9bd3f1;
 
-/* MENU BUTTONS */
-.sidebar-button {
-  width: 100%;
-  height: 35px;
-  border: none;
-  border-radius: 6px;
-  background: #c8c4c5;
-  color: #222222;
-  font-size: 16px;
-  cursor: pointer;
-}
+          border-radius: 4px;
 
-.sidebar-button:hover {
-  background: #bebabb;
-}
+          position: relative;
 
-        /* ==============================
-           MAIN CONTENT
-        ============================== */
+          flex-shrink: 0;
+        }
 
-        .main-content {
+        .logo-icon::after {
+          content: "";
+
+          position: absolute;
+
+          width: 15px;
+          height: 8px;
+
+          border-left: 4px solid #9bd3f1;
+          border-bottom: 4px solid #9bd3f1;
+
+          transform: rotate(-45deg);
+
+          left: 6px;
+          top: 7px;
+        }
+
+        .brand-name {
+          font-size: 22px;
+          font-weight: 600;
+          color: #222222;
+          white-space: nowrap;
+        }
+
+        /* NAVIGATION */
+
+        .nav-links {
           flex: 1;
 
-          min-width: 0;
-          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-          padding: 22px 25px 40px 20px;
-
-          background: #ffffff;
+          gap: 27px;
         }
 
+        .nav-link {
+          border: none;
+          background: transparent;
+
+          color: #111111;
+
+          font-size: 16px;
+
+          padding: 8px 0;
+
+          cursor: pointer;
+
+          white-space: nowrap;
+        }
+
+        .nav-link:hover {
+          color: #6bbce8;
+        }
+
+        /* PROFILE */
+
+        .profile-icon {
+          width: 34px;
+          height: 34px;
+
+          border-radius: 50%;
+
+          background: #000000;
+
+          position: relative;
+
+          flex-shrink: 0;
+
+          margin-left: 15px;
+
+          cursor: pointer;
+        }
+
+        .profile-icon::before {
+          content: "";
+
+          position: absolute;
+
+          width: 10px;
+          height: 10px;
+
+          background: #ffffff;
+
+          border-radius: 50%;
+
+          top: 7px;
+          left: 12px;
+        }
+
+        .profile-icon::after {
+          content: "";
+
+          position: absolute;
+
+          width: 18px;
+          height: 10px;
+
+          background: #ffffff;
+
+          border-radius: 12px 12px 7px 7px;
+
+          bottom: 6px;
+          left: 8px;
+        }
+
+        /* MAIN CONTENT */
+
+        .main-content {
+          width: 100%;
+
+          padding:
+            29px
+            16px
+            50px
+            16px;
+        }
 
         /* TITLE */
 
         .page-title {
           margin: 0;
 
-          font-size: 24px;
+          font-size: 27px;
 
-          line-height: 29px;
+          line-height: 34px;
 
           font-weight: 600;
 
@@ -178,55 +237,69 @@ function ProjectsBoardPage() {
         }
 
         .page-subtitle {
-          margin: 2px 0 26px;
+          margin:
+            3px
+            0
+            29px
+            2px;
 
-          font-size: 12px;
+          font-size: 13px;
 
-          line-height: 15px;
+          line-height: 17px;
 
           color: #333333;
         }
 
-
-        /* ==============================
-           SEARCH
-        ============================== */
+        /* SEARCH */
 
         .search-container {
-          width: 185px;
-          height: 38px;
+          width: 308px;
+          height: 39px;
 
           display: flex;
-          align-items: center;
 
-          margin-bottom: 18px;
+          align-items: center;
 
           background: #ffffff;
 
           border-radius: 4px;
 
           box-shadow:
-            0 5px 9px rgba(0, 0, 0, 0.20);
+            0 6px 10px rgba(0, 0, 0, 0.22);
+
+          margin-bottom: 23px;
         }
 
         .search-icon {
-          margin-left: 10px;
+          width: 28px;
 
-          font-size: 24px;
+          margin-left: 12px;
 
-          color: #aaaaaa;
+          font-size: 29px;
+
+          line-height: 1;
+
+          color: #b5b5b5;
+
+          transform: rotate(-20deg);
         }
 
         .search-input {
-          width: 145px;
-          height: 38px;
+          flex: 1;
+
+          height: 39px;
 
           border: none;
+
           outline: none;
 
-          padding: 0 5px;
+          background: transparent;
 
-          font-size: 16px;
+          padding:
+            0
+            8px;
+
+          font-size: 20px;
 
           color: #555555;
         }
@@ -235,28 +308,26 @@ function ProjectsBoardPage() {
           color: #999999;
         }
 
-
-        /* ==============================
-           PROJECT TABLE
-        ============================== */
+        /* PROJECT TABLE */
 
         .projects-table {
           width: 100%;
 
-          max-width: 100%;
+          min-height: 430px;
 
-          min-height: 385px;
-
-          padding: 14px 21px 15px;
+          padding:
+            17px
+            25px
+            25px
+            34px;
 
           background: #ffffff;
 
-          border-radius: 3px;
+          border-radius: 2px;
 
           box-shadow:
-            0 5px 10px rgba(0, 0, 0, 0.18);
+            0 5px 11px rgba(0, 0, 0, 0.20);
         }
-
 
         /* TABLE GRID */
 
@@ -265,173 +336,216 @@ function ProjectsBoardPage() {
           display: grid;
 
           grid-template-columns:
-            1.6fr
-            1.3fr
+            1.4fr
+            1.5fr
             1fr
-            1fr;
+            1fr
+            0.75fr;
 
           align-items: center;
         }
 
-
-        /* HEADER */
+        /* TABLE HEADER */
 
         .table-header {
-          height: 30px;
+          height: 38px;
 
           margin-bottom: 5px;
         }
 
         .table-header span {
-          font-size: 14px;
+          font-size: 18px;
 
           font-weight: 600;
 
           color: #222222;
         }
 
-
-        /* ROWS */
+        /* PROJECT ROWS */
 
         .project-row {
-          height: 41px;
+          min-height: 55px;
+
+          border-top: 1px solid #eeeeee;
         }
 
         .project-name,
-        .project-type,
-        .due-date {
-          font-size: 14px;
+        .project-description,
+        .project-status,
+        .project-members {
+          font-size: 16px;
 
           color: #444444;
+
+          padding-right: 10px;
         }
 
+        /* STATUS */
 
-        /* ==============================
-           PRIORITY
-        ============================== */
-
-        .priority {
+        .project-status {
           display: flex;
 
           align-items: center;
 
-          gap: 8px;
-
-          font-size: 14px;
-
-          color: #444444;
+          gap: 10px;
         }
 
-        .priority-dot {
-          width: 15px;
-          height: 15px;
+        .status-dot {
+          width: 14px;
+          height: 14px;
 
           border-radius: 50%;
 
-          display: inline-block;
+          background: #9bd3f1;
 
           flex-shrink: 0;
         }
 
-        .priority-high {
-          background: #74130b;
+        /* VIEW BUTTON */
+
+        .view-project-button {
+          width: 105px;
+
+          height: 32px;
+
+          border: none;
+
+          border-radius: 5px;
+
+          background: #9bd3f1;
+
+          color: #222222;
+
+          font-size: 14px;
+
+          font-weight: 500;
+
+          cursor: pointer;
+
+          transition:
+            background 0.2s ease,
+            transform 0.1s ease;
         }
 
-        .priority-medium {
-          background: #c94d35;
+        .view-project-button:hover {
+          background: #78c3e9;
         }
 
-        .priority-low {
-          background: #68f33d;
+        .view-project-button:active {
+          transform: scale(0.97);
         }
 
-
-        /* ==============================
-           DUE DATE
-        ============================== */
-
-        .due-date {
-          display: flex;
-
-          align-items: center;
-
-          gap: 5px;
-
-          white-space: nowrap;
+        .message {
+          font-size: 18px;
+          padding: 25px 0;
+          color: #555555;
         }
 
-        .clock-icon {
-          font-size: 16px;
+        .error-message {
+          color: #b00020;
+        }
 
-          color: #333333;
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+
+          .brand {
+            min-width: 250px;
+          }
+
+          .nav-links {
+            gap: 17px;
+          }
+
+          .nav-link {
+            font-size: 14px;
+          }
+
+          .projects-table {
+            overflow-x: auto;
+          }
+
+          .table-header,
+          .project-row {
+            min-width: 780px;
+          }
+        }
+
+        @media (max-width: 700px) {
+
+          .top-navbar {
+            height: auto;
+
+            min-height: 58px;
+
+            flex-wrap: wrap;
+
+            padding: 10px;
+          }
+
+          .brand {
+            flex: 1;
+
+            min-width: auto;
+          }
+
+          .nav-links {
+            order: 3;
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            justify-content: flex-start;
+
+            padding-top: 8px;
+          }
+
+          .profile-icon {
+            margin-left: 10px;
+          }
+
+          .main-content {
+            padding:
+              25px
+              12px;
+          }
+
+          .search-container {
+            width: 100%;
+
+            max-width: 308px;
+          }
+
+          .projects-table {
+            overflow-x: auto;
+          }
+
+          .table-header,
+          .project-row {
+            min-width: 780px;
+          }
         }
 
       `}</style>
 
-
       <div className="projects-page">
 
+        {/* TOP NAVBAR */}
 
-        {/* ============================
-            SIDEBAR
-        ============================ */}
+        <NavigationBar />
 
-        <aside className="sidebar">
-
-          <div className="sidebar-logo">
-
-            <div className="logo-check"></div>
-
-            <span>
-              CollabBoard
-            </span>
-
-          </div>
-
-
-          <div className="sidebar-menu">
-
-            <button className="sidebar-button">
-              All Projects
-            </button>
-
-            <button className="sidebar-button">
-              My Projects
-            </button>
-
-            <button className="sidebar-button">
-              Create Project
-            </button>
-
-            <button className="sidebar-button">
-              My Status
-            </button>
-
-            <button className="sidebar-button">
-              My Account
-            </button>
-
-          </div>
-
-        </aside>
-
-
-        {/* ============================
-            MAIN CONTENT
-        ============================ */}
+        {/* MAIN CONTENT */}
 
         <main className="main-content">
-
 
           <h1 className="page-title">
             All Projects
           </h1>
 
-
           <p className="page-subtitle">
-            View and manage All Tasks
+            View and manage all projects
           </p>
-
 
           {/* SEARCH */}
 
@@ -445,89 +559,102 @@ function ProjectsBoardPage() {
               type="text"
               className="search-input"
               placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
 
           </div>
 
-
           {/* PROJECT TABLE */}
-
-          <div className="projects-table">
-
-
-            {/* HEADER */}
-
-            <div className="table-header">
-
-              <span>
-                Project
-              </span>
-
-              <span>
-                Type
-              </span>
-
-              <span>
-                Priority
-              </span>
-
-              <span>
-                Due Date
-              </span>
-
-            </div>
-
-
-            {/* PROJECTS */}
-
-            {projects.map((project) => (
-
-              <div
-                className="project-row"
-                key={project.name}
-              >
-
-                <span className="project-name">
-                  {project.name}
-                </span>
-
-
-                <span className="project-type">
-                  {project.type}
-                </span>
-
-
-                <span className="priority">
-
-                  <span
-                    className={`priority-dot ${
-                      project.priority === "High"
-                        ? "priority-high"
-                        : project.priority === "Medium"
-                        ? "priority-medium"
-                        : "priority-low"
-                    }`}
-                  />
-
-                  {project.priority}
-
-                </span>
-
-
-                <span className="due-date">
-
-                  <span className="clock-icon">
-                    ◷
-                  </span>
-
-                  {project.dueDate}
-
-                </span>
-
+          <div className="responsive-table-wrapper">
+            <div className="projects-table">
+              <div className="table-header">
+                <span>Project</span>
+                <span>Description</span>
+                <span>Status</span>
+                <span>Members</span>
+                <span>Action</span>
               </div>
 
-            ))}
+              {loading && (
+                <p className="message">
+                  Loading projects...
+                </p>
+              )}
 
+              {error && (
+                <p className="message error-message">
+                  {error}
+                </p>
+              )}
+
+              {!loading &&
+                !error &&
+                filteredProjects.length === 0 && (
+                  <p className="message">
+                    {searchTerm
+                      ? "No projects found."
+                      : "No projects available."}
+                  </p>
+                )}
+
+              {!loading &&
+                !error &&
+                filteredProjects.map((project) => (
+                  <div
+                    className="project-row"
+                    key={project._id || project.id}
+                  >
+                    <span className="project-name">
+                      {project.name}
+                    </span>
+
+                    <span className="project-description">
+                      {project.description}
+                    </span>
+
+                    <span className="project-status">
+                      <span
+                        className="status-dot"
+                        style={{
+                          backgroundColor: project.isClosed
+                            ? "#ef4444"
+                            : project.status === "DONE"
+                            ? "#10b981"
+                            : project.status === "SUBMITTED"
+                            ? "#3b82f6"
+                            : (project.members?.length || 0) >= (project.requiredMembers || 3)
+                            ? "#f59e0b"
+                            : "#0ea5e9",
+                        }}
+                      ></span>
+                      {project.isClosed
+                        ? "Closed"
+                        : project.status === "DONE"
+                        ? "Done (Approved)"
+                        : project.status === "SUBMITTED"
+                        ? "Submitted"
+                        : (project.members?.length || 0) >= (project.requiredMembers || 3)
+                        ? "Doing (Started)"
+                        : "To Do (Filling)"}
+                    </span>
+
+                    <span className="project-members">
+                      {Array.isArray(project.members) ? project.members.length : 0} /{" "}
+                      {project.requiredMembers || 3} Enrolled
+                    </span>
+
+                    <button
+                      className="view-project-button"
+                      onClick={() =>
+                        navigate(`/view-project?id=${project._id || project.id}`)
+                      }
+                    >
+                      View Project
+                    </button>
+                  </div>
+                ))}
+            </div>
           </div>
 
         </main>

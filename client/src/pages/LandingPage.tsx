@@ -1,6 +1,10 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import dashboardImage from "../assets/Landing Page .png";
 
 function LandingPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   return (
     <>
       <style>{`
@@ -310,7 +314,11 @@ function LandingPage() {
         {/* Navbar */}
         <nav className="navbar">
 
-          <div className="logo-section">
+          <div
+            className="logo-section"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(user ? "/dashboard" : "/")}
+          >
             <div className="logo-icon"></div>
 
             <div className="logo">
@@ -319,15 +327,33 @@ function LandingPage() {
           </div>
 
           <div className="nav-buttons">
+            {user ? (
+              <button
+                type="button"
+                className="nav-button"
+                onClick={() => navigate("/dashboard")}
+              >
+                Dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="nav-button"
+                  onClick={() => navigate("/register")}
+                >
+                  Sign Up
+                </button>
 
-            <button className="nav-button">
-              Sign Up
-            </button>
-
-            <button className="nav-button">
-              Login
-            </button>
-
+                <button
+                  type="button"
+                  className="nav-button"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+              </>
+            )}
           </div>
 
         </nav>
@@ -360,6 +386,20 @@ function LandingPage() {
               Plan tasks, collaborate with your team,
               and track project progress — all in one place.
             </p>
+
+            <button
+              type="button"
+              className="nav-button"
+              style={{
+                marginTop: "20px",
+                padding: "10px 28px",
+                fontSize: "17px",
+                fontWeight: 700
+              }}
+              onClick={() => navigate(user ? "/dashboard" : "/register")}
+            >
+              {user ? "Go to Dashboard →" : "Get Started →"}
+            </button>
 
           </div>
 
