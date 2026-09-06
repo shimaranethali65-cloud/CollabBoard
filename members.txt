@@ -1,0 +1,228 @@
+================================================================================
+                    COLLABBOARD - 7-MEMBER GROUP PROJECT DIVISION
+================================================================================
+Project Name   : CollabBoard - Collaborative Project & Team Management System
+Architecture   : React + TypeScript (Vite) Frontend | Node.js + Express + Prisma + MongoDB Backend
+Team Size      : 7 Members
+Generated Date : September 2026
+
+--------------------------------------------------------------------------------
+OVERVIEW OF WORKLOAD DISTRIBUTION
+--------------------------------------------------------------------------------
+The entire CollabBoard system has been architected into 7 distinct, cohesive, and
+well-balanced modules. Each member owns full-stack responsibilities (frontend
+pages, backend controllers, routes, models, and services) ensuring that all 7
+team members have an equal and independent share of the project.
+
+Member 1 : Authentication, Authorization & User Identity Management
+Member 2 : Admin Panel, Project Oversight & Approval System
+Member 3 : Project Discovery, Catalog & Exploration Board
+Member 4 : Project Workspace, Member Enrollment & Leadership Hierarchy
+Member 5 : Task Management & Kanban Board Workflow
+Member 6 : Project Status Tracking, Filtering & Personal Portfolio
+Member 7 : User Profiles, Team Directory, Navigation & System Core
+
+================================================================================
+MEMBER 1: AUTHENTICATION, AUTHORIZATION & USER IDENTITY MANAGEMENT
+================================================================================
+Responsibilities:
+- User registration and login flows with form validation and feedback
+- Dual authentication architecture (Regular User login vs Admin login separation)
+- Global session management, JWT creation, token storage, and persistent state
+- Role-based route protection (guards for guest, authenticated user, and admin)
+- Password security using bcrypt encryption and authentication middleware
+
+Assigned Files:
+1.  client/src/pages/LoginPage.tsx
+    - Dedicated user login page (/login) with authentication validation
+2.  client/src/pages/RegisterPage.tsx
+    - User registration page (/register) with visual design assets
+3.  client/src/context/AuthContext.tsx
+    - React Context provider managing user state, tokens, login/logout functions
+4.  client/src/components/ProtectedRoute.tsx
+    - Route wrapper enforcing authentication and role permissions
+5.  client/src/services/authService.ts
+    - Client API calls for login, registration, admin-login, and token refresh
+6.  server/src/controllers/authController.ts
+    - Handlers for register, login, adminLogin, and getCurrentUser
+7.  server/src/routes/authRoutes.ts
+    - Express routing for /api/auth/register, /api/auth/login, /api/auth/admin-login, /api/auth/me
+8.  server/src/middleware/requireAuth.ts
+    - JWT token verification middleware, optionalAuth, and requireAdmin guards
+9.  server/src/utils/auth.ts
+    - Password hashing, bcrypt comparison, and JWT token signing/verification
+10. server/src/models/User.ts
+    - User model TypeScript definitions and public user serialization
+
+================================================================================
+MEMBER 2: ADMIN PANEL, PROJECT OVERSIGHT & APPROVAL SYSTEM
+================================================================================
+Responsibilities:
+- Dedicated Admin Portal accessed at /admin with secure admin credentials
+- Vertical navigation layout with AdminSidebar component
+- Project creation interface with required member capacity and priority settings
+- Admin dashboard displaying system-wide metrics (Total, ToDo, Doing, Submitted, Done, Closed)
+- Project lifecycle approval: reviewing submitted projects and marking them officially "DONE"
+- Administrative project controls: updating project deadlines and closing projects
+
+Assigned Files:
+1.  client/src/pages/AdminPage.tsx
+    - Admin control center (/admin) for project creation, stats overview, approvals, and controls
+2.  client/src/components/AdminSidebar.tsx
+    - Vertical navigation sidebar exclusive to the admin panel
+3.  client/src/services/projectService.ts (Admin methods)
+    - createProject, approveProject, closeProject, updateDeadline, getAdminOverview
+4.  server/src/controllers/projectController.ts (Admin functions)
+    - createProject, getAdminOverview, approveProject, closeProject, updateDeadline, deleteProject
+5.  server/src/routes/projectRoutes.ts (Admin routes)
+    - POST /api/projects, GET /api/projects/admin/overview, POST /:id/approve, POST /:id/close, PUT /:id/deadline
+6.  server/src/seed.ts
+    - Database seeder initializing the default admin account (admin / admin123)
+
+================================================================================
+MEMBER 3: PROJECT DISCOVERY, CATALOG & EXPLORATION BOARD
+================================================================================
+Responsibilities:
+- Public and authenticated project exploration catalog (/projects)
+- Real-time search by title, description, and technology tags
+- Project card components showing current/required member progress bars
+- Landing page with platform introduction, hero visuals, and feature callouts
+- User dashboard homepage (/dashboard) aggregating recent projects and quick actions
+
+Assigned Files:
+1.  client/src/pages/ProjectsBoardPage.tsx
+    - Project catalog board (/projects) with search bar, technology pills, and project cards
+2.  client/src/pages/LandingPage.tsx
+    - Public marketing landing page (/) with hero section, CTA buttons, and branding
+3.  client/src/pages/DashboardPage.tsx
+    - User dashboard (/dashboard) showing recent activities, statistics, and quick navigation
+4.  client/src/services/dashboardService.ts
+    - Frontend API service fetching dashboard summary and statistics
+5.  server/src/controllers/dashboardController.ts
+    - Backend controller calculating user-specific activity and dashboard statistics
+6.  server/src/routes/dashboardRoutes.ts
+    - Express router for /api/dashboard endpoints
+
+================================================================================
+MEMBER 4: PROJECT WORKSPACE, MEMBER ENROLLMENT & LEADERSHIP HIERARCHY
+================================================================================
+Responsibilities:
+- In-depth project details workspace (/view-project)
+- Self-enrollment and unenrollment system for regular users
+- Automatic First-Enrolled Member leadership assignment (leaderId)
+- Project Leader authority:
+    * Only the designated leader can submit the project for Admin approval
+    * Only the leader can transfer leadership to another enrolled member
+- Auto-status progression: projects automatically transition from TODO to DOING when member quota is reached
+- Relational schema modeling in Prisma for projects, members, and leaders
+
+Assigned Files:
+1.  client/src/pages/ViewProjectPage.tsx
+    - Comprehensive project workspace: details, enrollment buttons, submit project, leader delegation modal
+2.  client/src/services/projectService.ts (Workspace & Leader methods)
+    - enrollInProject, unenrollFromProject, changeProjectLeader, getProjectById
+3.  server/prisma/schema.prisma (Project & Membership models)
+    - Project model, ProjectMember join table, leaderId foreign keys and relations
+4.  server/src/models/project.ts
+    - PopulatedProject interface, serializeProject helper, Prisma include queries
+5.  server/src/controllers/projectController.ts (Enrollment & Leader functions)
+    - enroll, unenroll, changeLeader, submitProject
+6.  server/src/utils/projectAccess.ts
+    - Permission checks: assertMember, assertLeader, assertOwner, isLeader
+
+================================================================================
+MEMBER 5: TASK MANAGEMENT & KANBAN BOARD WORKFLOW
+================================================================================
+Responsibilities:
+- Full task lifecycle management within projects (Create, Read, Update, Delete)
+- Kanban workflow implementation (TODO -> IN_PROGRESS -> COMPLETED)
+- Task assignment to enrolled project members with due dates and priority levels
+- Task progress calculation powering project completion percentage meters
+
+Assigned Files:
+1.  client/src/services/taskService.ts
+    - Task API client (getTasksByProject, createTask, updateTaskStatus, deleteTask)
+2.  server/src/models/Task.ts
+    - Task model interface, Prisma relation mapping, TaskStatus and Priority enums
+3.  server/src/controllers/taskController.ts
+    - Handlers: createTask, getProjectTasks, updateTask, deleteTask, getTaskById
+4.  server/src/routes/taskRoutes.ts
+    - Express routing for /api/tasks and /api/projects/:projectId/tasks
+5.  server/src/services/taskService.ts
+    - Task business logic layer validating assignment to valid project members
+
+================================================================================
+MEMBER 6: PROJECT STATUS TRACKING, FILTERING & PERSONAL PORTFOLIO
+================================================================================
+Responsibilities:
+- Three-phase project lifecycle tracking board (/task-status):
+    * TODO: Projects actively recruiting (waiting for required members to fill)
+    * DOING: Quota filled, active development ongoing
+    * DONE: Leader submitted & Admin approved
+- Personal projects portfolio (/my-projects) showing only projects the user is enrolled in
+- Progress visualization and quick-action project submission for leaders
+
+Assigned Files:
+1.  client/src/pages/TaskStatusPage.tsx
+    - Tri-column lifecycle tracking board (/task-status) separating TODO, DOING, and DONE projects
+2.  client/src/pages/MyProjectsPage.tsx
+    - User's enrolled projects list (/my-projects) showing team role, leader status, and progress
+3.  client/src/services/projectService.ts (Query & Status methods)
+    - getMyProjects, submitProject
+4.  server/src/controllers/projectController.ts (Listing & Status functions)
+    - getMyProjects, getProjects (with status filtering), withProgress calculation helper
+5.  server/src/utils/validators.ts
+    - Status validation (TODO, DOING, SUBMITTED, DONE, CLOSED) and priority rules
+
+================================================================================
+MEMBER 7: USER PROFILES, TEAM DIRECTORY, NAVIGATION & SYSTEM CORE
+================================================================================
+Responsibilities:
+- User profile view and update workflows (/profile, /edit-profile)
+- Project team directory (/project-members) displaying member list, roles, and LEADER gold badges
+- Leader delegation action inside team directory (Make Leader button)
+- Global NavigationBar with active link highlights and user profile avatar dropdown
+- Centralized HTTP client, error handling, API response standardization, and main routing
+
+Assigned Files:
+1.  client/src/pages/ProfilePage.tsx
+    - User profile view page displaying bio, email, username, and role
+2.  client/src/pages/EditProfilePage.tsx
+    - Profile edit form allowing name, email, and password updates
+3.  client/src/pages/ViewProjectMembersPage.tsx
+    - Team roster page (/project-members) with LEADER crowns, role indicators, and leader transfer
+4.  client/src/components/NavigationBar.tsx
+    - Responsive top navigation bar, active link styling, and profile popover
+5.  client/src/components/AppHeader.tsx
+    - Universal header component with logo and application title
+6.  client/src/components/ProjectMemberSelector.tsx
+    - Reusable dynamic member search and multi-select autocomplete component
+7.  client/src/services/api.ts
+    - Centralized fetch API wrapper with automatic Bearer token injection and error handling
+8.  client/src/services/userService.ts
+    - User search and profile management client service
+9.  client/src/App.tsx
+    - Main client router linking all 7 modules, pages, and navigation guards
+10. server/src/controllers/userController.ts
+    - Handlers for user search, user profile retrieval, and user profile update
+11. server/src/routes/userRoutes.ts
+    - Express routes for /api/users, /api/users/profile, /api/users/:id
+12. server/src/middleware/errorHandler.ts & server/src/utils/AppError.ts
+    - Global error handler middleware and standard AppError class
+13. server/src/utils/response.ts
+    - Standardized API response format ({ success, data, message })
+
+================================================================================
+SUMMARY TABLE FOR PRESENTATION & REPORTING
+================================================================================
+Member | Assigned Module                    | Primary Pages & Components
+-------+------------------------------------+-----------------------------------
+M1     | Auth & Role-Based Access           | LoginPage, RegisterPage, AuthContext
+M2     | Admin Portal & Approval Governance | AdminPage, AdminSidebar, seed.ts
+M3     | Project Discovery & Landing Board  | ProjectsBoardPage, LandingPage, DashboardPage
+M4     | Project Workspace & Leader Flow    | ViewProjectPage, schema.prisma, Leader Flow
+M5     | Task & Kanban Management           | taskService, taskController, Task.ts
+M6     | Lifecycle Tracking & My Projects   | TaskStatusPage, MyProjectsPage
+M7     | User Profiles, Members & Nav Core  | ProfilePage, ViewProjectMembersPage, NavigationBar
+================================================================================
+
