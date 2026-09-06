@@ -1,60 +1,39 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getProjects, type Project } from "../services/projectService";
 
 function ProjectsBoardPage() {
   const navigate = useNavigate();
 
-  const projects = [
-    {
-      name: "DonorBridge",
-      type: "Web Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "FixFinder",
-      type: "Mobile Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BlindMatch",
-      type: "Web Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "CollabBoard",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "LecturerFinder",
-      type: "Mobile Application",
-      priority: "Medium",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "UMS",
-      type: "Web Application",
-      priority: "High",
-      dueDate: "19.11.2026",
-    },
-    {
-      name: "BloodDonate",
-      type: "Mobile Application",
-      priority: "Low",
-      dueDate: "19.11.2026",
-    },
-  ];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (err) {
+        setError("Failed to load projects");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Filter projects based on the search input
+  const filteredProjects = projects.filter((project) =>
+    project.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
       <style>{`
-
-        /* =========================
-           RESET
-        ========================= */
 
         * {
           box-sizing: border-box;
@@ -75,21 +54,13 @@ function ProjectsBoardPage() {
           color: #333333;
         }
 
-
-        /* =========================
-           MAIN PAGE
-        ========================= */
-
         .projects-page {
           width: 100%;
           min-height: 100vh;
           background: #ffffff;
         }
 
-
-        /* =========================
-           TOP NAVIGATION BAR
-        ========================= */
+        /* TOP NAVIGATION BAR */
 
         .top-navbar {
           width: 100%;
@@ -108,10 +79,7 @@ function ProjectsBoardPage() {
             0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
-
-        /* =========================
-           LOGO
-        ========================= */
+        /* LOGO */
 
         .brand {
           display: flex;
@@ -154,26 +122,18 @@ function ProjectsBoardPage() {
 
         .brand-name {
           font-size: 22px;
-
           font-weight: 600;
-
           color: #222222;
-
           white-space: nowrap;
         }
 
-
-        /* =========================
-           NAVIGATION LINKS
-        ========================= */
+        /* NAVIGATION */
 
         .nav-links {
           flex: 1;
 
           display: flex;
-
           align-items: center;
-
           justify-content: center;
 
           gap: 27px;
@@ -181,7 +141,6 @@ function ProjectsBoardPage() {
 
         .nav-link {
           border: none;
-
           background: transparent;
 
           color: #111111;
@@ -199,10 +158,7 @@ function ProjectsBoardPage() {
           color: #6bbce8;
         }
 
-
-        /* =========================
-           PROFILE ICON
-        ========================= */
+        /* PROFILE */
 
         .profile-icon {
           width: 34px;
@@ -217,6 +173,8 @@ function ProjectsBoardPage() {
           flex-shrink: 0;
 
           margin-left: 15px;
+
+          cursor: pointer;
         }
 
         .profile-icon::before {
@@ -251,10 +209,7 @@ function ProjectsBoardPage() {
           left: 8px;
         }
 
-
-        /* =========================
-           MAIN CONTENT
-        ========================= */
+        /* MAIN CONTENT */
 
         .main-content {
           width: 100%;
@@ -266,10 +221,7 @@ function ProjectsBoardPage() {
             16px;
         }
 
-
-        /* =========================
-           PAGE TITLE
-        ========================= */
+        /* TITLE */
 
         .page-title {
           margin: 0;
@@ -297,10 +249,7 @@ function ProjectsBoardPage() {
           color: #333333;
         }
 
-
-        /* =========================
-           SEARCH
-        ========================= */
+        /* SEARCH */
 
         .search-container {
           width: 308px;
@@ -358,10 +307,7 @@ function ProjectsBoardPage() {
           color: #999999;
         }
 
-
-        /* =========================
-           PROJECT TABLE
-        ========================= */
+        /* PROJECT TABLE */
 
         .projects-table {
           width: 100%;
@@ -382,29 +328,23 @@ function ProjectsBoardPage() {
             0 5px 11px rgba(0, 0, 0, 0.20);
         }
 
-
-        /* =========================
-           TABLE GRID
-        ========================= */
+        /* TABLE GRID */
 
         .table-header,
         .project-row {
           display: grid;
 
           grid-template-columns:
-            1.35fr
-            1.05fr
-            0.85fr
-            0.85fr
+            1.4fr
+            1.5fr
+            1fr
+            1fr
             0.75fr;
 
           align-items: center;
         }
 
-
-        /* =========================
-           TABLE HEADER
-        ========================= */
+        /* TABLE HEADER */
 
         .table-header {
           height: 38px;
@@ -420,92 +360,47 @@ function ProjectsBoardPage() {
           color: #222222;
         }
 
-
-        /* =========================
-           PROJECT ROWS
-        ========================= */
+        /* PROJECT ROWS */
 
         .project-row {
-          height: 45px;
+          min-height: 55px;
+
+          border-top: 1px solid #eeeeee;
         }
 
         .project-name,
-        .project-type,
-        .due-date {
-          font-size: 18px;
+        .project-description,
+        .project-status,
+        .project-members {
+          font-size: 16px;
 
           color: #444444;
+
+          padding-right: 10px;
         }
 
+        /* STATUS */
 
-        /* =========================
-           PRIORITY
-        ========================= */
-
-        .priority {
+        .project-status {
           display: flex;
 
           align-items: center;
 
-          gap: 12px;
-
-          font-size: 18px;
-
-          color: #444444;
-
-          white-space: nowrap;
+          gap: 10px;
         }
 
-        .priority-dot {
-          width: 19px;
-          height: 19px;
+        .status-dot {
+          width: 14px;
+          height: 14px;
 
           border-radius: 50%;
 
-          display: inline-block;
+          background: #9bd3f1;
 
           flex-shrink: 0;
         }
 
-        .priority-high {
-          background: #74130b;
-        }
-
-        .priority-medium {
-          background: #c94d35;
-        }
-
-        .priority-low {
-          background: #68f33d;
-        }
-
-
-        /* =========================
-           DUE DATE
-        ========================= */
-
-        .due-date {
-          display: flex;
-
-          align-items: center;
-
-          gap: 9px;
-
-          white-space: nowrap;
-        }
-
-        .clock-icon {
-          font-size: 20px;
-
-          color: #111111;
-
-          line-height: 1;
-        }
-
-
-        /* =========================
-           VIEW PROJECT BUTTON
-        ========================= */
+        /* VIEW BUTTON */
 
         .view-project-button {
           width: 105px;
@@ -539,10 +434,17 @@ function ProjectsBoardPage() {
           transform: scale(0.97);
         }
 
+        .message {
+          font-size: 18px;
+          padding: 25px 0;
+          color: #555555;
+        }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        .error-message {
+          color: #b00020;
+        }
+
+        /* RESPONSIVE */
 
         @media (max-width: 1100px) {
 
@@ -564,10 +466,9 @@ function ProjectsBoardPage() {
 
           .table-header,
           .project-row {
-            min-width: 950px;
+            min-width: 1000px;
           }
         }
-
 
         @media (max-width: 700px) {
 
@@ -621,41 +522,25 @@ function ProjectsBoardPage() {
 
           .table-header,
           .project-row {
-            min-width: 950px;
+            min-width: 1000px;
           }
         }
 
       `}</style>
 
-
-      {/* =========================
-          PAGE
-      ========================= */}
-
       <div className="projects-page">
 
-
-        {/* =========================
-            TOP NAVBAR
-        ========================= */}
+        {/* TOP NAVBAR */}
 
         <header className="top-navbar">
 
-
-          {/* LOGO */}
-
           <div className="brand">
-
             <div className="logo-icon"></div>
 
             <span className="brand-name">
               CollabBoard
             </span>
-
           </div>
-
-
-          {/* NAVIGATION */}
 
           <nav className="nav-links">
 
@@ -696,36 +581,24 @@ function ProjectsBoardPage() {
 
           </nav>
 
-
-          {/* PROFILE */}
-
           <div
             className="profile-icon"
             onClick={() => navigate("/profile")}
-            style={{ cursor: "pointer" }}
           ></div>
 
         </header>
 
-
-        {/* =========================
-            MAIN CONTENT
-        ========================= */}
+        {/* MAIN CONTENT */}
 
         <main className="main-content">
-
-
-          {/* TITLE */}
 
           <h1 className="page-title">
             All Projects
           </h1>
 
-
           <p className="page-subtitle">
-            View and manage All Tasks
+            View and manage all projects
           </p>
-
 
           {/* SEARCH */}
 
@@ -739,115 +612,93 @@ function ProjectsBoardPage() {
               type="text"
               className="search-input"
               placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
 
           </div>
 
-
-          {/* =========================
-              PROJECT TABLE
-          ========================= */}
+          {/* PROJECT TABLE */}
 
           <div className="projects-table">
 
-
-            {/* TABLE HEADER */}
-
             <div className="table-header">
 
-              <span>
-                Project
-              </span>
+              <span>Project</span>
 
-              <span>
-                Type
-              </span>
+              <span>Description</span>
 
-              <span>
-                Priority
-              </span>
+              <span>Status</span>
 
-              <span>
-                Due Date
-              </span>
+              <span>Members</span>
 
-              <span>
-                Action
-              </span>
+              <span>Action</span>
 
             </div>
 
+            {loading && (
+              <p className="message">
+                Loading projects...
+              </p>
+            )}
 
-            {/* PROJECTS */}
+            {error && (
+              <p className="message error-message">
+                {error}
+              </p>
+            )}
 
-            {projects.map((project) => (
+            {!loading &&
+              !error &&
+              filteredProjects.length === 0 && (
+                <p className="message">
+                  {searchTerm
+                    ? "No projects found."
+                    : "No projects available."}
+                </p>
+              )}
 
-              <div
-                className="project-row"
-                key={project.name}
-              >
+            {!loading &&
+              !error &&
+              filteredProjects.map((project) => (
 
+                <div
+                  className="project-row"
+                  key={project.id}
+                >
 
-                {/* PROJECT NAME */}
-
-                <span className="project-name">
-                  {project.name}
-                </span>
-
-
-                {/* TYPE */}
-
-                <span className="project-type">
-                  {project.type}
-                </span>
-
-
-                {/* PRIORITY */}
-
-                <span className="priority">
-
-                  <span
-                    className={`priority-dot ${
-                      project.priority === "High"
-                        ? "priority-high"
-                        : project.priority === "Medium"
-                        ? "priority-medium"
-                        : "priority-low"
-                    }`}
-                  />
-
-                  {project.priority}
-
-                </span>
-
-
-                {/* DUE DATE */}
-
-                <span className="due-date">
-
-                  <span className="clock-icon">
-                    ◷
+                  <span className="project-name">
+                    {project.name}
                   </span>
 
-                  {project.dueDate}
+                  <span className="project-description">
+                    {project.description}
+                  </span>
 
-                </span>
+                  <span className="project-status">
 
+                    <span className="status-dot"></span>
 
-                {/* VIEW PROJECT */}
+                    {project.status}
 
-                <button
-                  className="view-project-button"
-                  onClick={() => navigate("/project")}
-                >
-                  View Project
-                </button>
+                  </span>
 
+                  <span className="project-members">
+                    {project.members.join(", ")}
+                  </span>
 
-              </div>
+                  <button
+                    className="view-project-button"
+                    onClick={() =>
+                      navigate(`/view-project?id=${project.id}`)
+                    }
+                  >
+                    View Project
+                  </button>
 
-            ))}
+                </div>
 
+              ))}
 
           </div>
 

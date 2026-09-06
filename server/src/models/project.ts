@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Prisma, Project as PrismaProject, User as PrismaUser } from "@prisma/client";
 import { Priority, ProjectStatus } from "../utils/validators";
 import { serializePublicUser } from "./User";
@@ -27,7 +28,11 @@ export type IProject = PopulatedProject;
 const projectInclude = {
   owner: true,
   leader: true,
-  members: { include: { user: true } }
+  members: {
+    include: {
+      user: true
+    }
+  }
 } satisfies Prisma.ProjectInclude;
 
 export type ProjectWithRelations = Prisma.ProjectGetPayload<{
@@ -40,7 +45,9 @@ export const serializeProject = (
   project: PrismaProject & {
     owner: PrismaUser;
     leader?: PrismaUser | null;
-    members: { user: PrismaUser }[];
+    members: {
+      user: PrismaUser;
+    }[];
   }
 ): PopulatedProject => ({
   _id: project.id,
@@ -54,10 +61,15 @@ export const serializeProject = (
   submittedAt: project.submittedAt,
   approvedAt: project.approvedAt,
   leaderId: project.leaderId || null,
-  leader: project.leader ? serializePublicUser(project.leader) : null,
+  leader: project.leader
+    ? serializePublicUser(project.leader)
+    : null,
   owner: serializePublicUser(project.owner),
-  members: project.members.map((member) => serializePublicUser(member.user)),
+  members: project.members.map((member) =>
+    serializePublicUser(member.user)
+  ),
   technologies: project.technologies,
   createdAt: project.createdAt,
   updatedAt: project.updatedAt
 });
+>>>>>>> origin/main
