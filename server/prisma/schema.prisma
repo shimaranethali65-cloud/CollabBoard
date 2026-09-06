@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  profileImage String   @default("")
+  role         String   @default("USER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedProjects Project[]        @relation("ProjectOwner")
+  ledProjects   Project[]        @relation("ProjectLeader")
+  memberships   ProjectMember[]
+  assignedTasks Task[]           @relation("TaskAssignee")
+  createdTasks  Task[]           @relation("TaskCreator")
+
+  @@map("users")
+}
+
+model Project {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String
+  dueDate         DateTime?
+  status          String    @default("TODO")
+  priority        String    @default("MEDIUM")
+  requiredMembers Int       @default(3)
+  isClosed        Boolean   @default(false)
+  submittedAt     DateTime?
+  approvedAt      DateTime?
+  leaderId        String?   @db.ObjectId
+  leader          User?     @relation("ProjectLeader", fields: [leaderId], references: [id])
+  ownerId         String    @db.ObjectId
+  owner           User      @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members         ProjectMember[]
+  technologies    String[]  @default([])
+  tasks           Task[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([ownerId])
+  @@index([leaderId])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String   @db.ObjectId
+  userId    String   @db.ObjectId
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+model Task {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId    String    @db.ObjectId
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title        String
+  description  String    @default("")
+  assignedToId String?   @db.ObjectId
+  assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  status       String    @default("TODO")
+  priority     String    @default("MEDIUM")
+  dueDate      DateTime?
+  createdById  String    @db.ObjectId
+  createdBy    User      @relation("TaskCreator", fields: [createdById], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([assignedToId])
+  @@index([status])
+  @@map("tasks")
+}
