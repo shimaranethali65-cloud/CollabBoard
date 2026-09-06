@@ -1,24 +1,33 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import NavigationBar from "../components/NavigationBar";
+import { getMyProjects } from "../services/projectService";
+import type { Project } from "../types";
+
 function MyProjectsPage() {
-  const projects = [
-    {
-      icon: "📁",
-      title: "Kanban Application",
-      description: "A task management application using Kanban board.",
-      iconBackground: "#eadcf3",
-    },
-    {
-      icon: "📱",
-      title: "Mobile App Development",
-      description: "Building a cross platform mobile application.",
-      iconBackground: "#d9f3df",
-    },
-    {
-      icon: "◎",
-      title: "Website Redesign",
-      description: "Redesigning the company website UI/UX",
-      iconBackground: "#fff4c7",
-    },
-  ];
+  const navigate = useNavigate();
+  const [realProjects, setRealProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getMyProjects()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setRealProjects(data);
+        }
+      })
+      .catch((err) => console.error("Could not load my projects:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const projectsToDisplay = realProjects.map((p, idx) => ({
+    _id: p._id || p.id || String(idx),
+    icon: idx % 3 === 0 ? "📁" : idx % 3 === 1 ? "📱" : "◎",
+    name: p.name,
+    description: p.description,
+    members: p.members || [],
+    iconBackground: idx % 3 === 0 ? "#eadcf3" : idx % 3 === 1 ? "#d9f3df" : "#fff4c7",
+  }));
 
   return (
     <>
@@ -360,21 +369,52 @@ function MyProjectsPage() {
         }
 
         @media (max-width: 650px) {
-
-          .nav-links {
-            display: none;
+          .my-projects-page {
+            padding: 20px 14px;
           }
 
           .projects-header {
             flex-direction: column;
-
             align-items: flex-start;
-
-            gap: 20px;
+            gap: 16px;
+            margin-bottom: 24px;
           }
 
           .projects-title {
-            font-size: 30px;
+            font-size: 26px;
+          }
+
+          .projects-subtitle {
+            font-size: 15px;
+          }
+
+          .new-project-button {
+            font-size: 14px;
+            padding: 10px 16px;
+            width: 100%;
+            text-align: center;
+          }
+
+          .project-card {
+            padding: 18px 16px;
+          }
+
+          .project-left {
+            gap: 12px;
+          }
+
+          .project-icon-box {
+            width: 48px;
+            height: 48px;
+            font-size: 22px;
+          }
+
+          .project-content h2 {
+            font-size: 20px;
+          }
+
+          .project-description {
+            font-size: 14px;
           }
         }
       `}</style>
@@ -383,24 +423,7 @@ function MyProjectsPage() {
           NAVIGATION BAR
       ========================= */}
 
-      <nav className="navbar">
-        <div className="nav-logo">
-          <div className="logo-icon">✓</div>
-          <span>CollabBoard</span>
-        </div>
-
-        <div className="nav-links">
-          <a href="#">Dashboard</a>
-          <a href="#">All Projects</a>
-          <a href="#">My Projects</a>
-          <a href="#">Create Project</a>
-          <a href="#">My Status</a>
-        </div>
-
-        <div className="profile-icon">
-          👤
-        </div>
-      </nav>
+      <NavigationBar />
 
       {/* =========================
           MAIN PAGE
@@ -419,86 +442,147 @@ function MyProjectsPage() {
             </p>
           </div>
 
-          <button className="new-project-button">
-            + &nbsp;New Project
+          <button
+            className="new-project-button"
+            type="button"
+            onClick={() => navigate("/projects")}
+          >
+            Browse All Projects →
           </button>
         </div>
 
         <div className="projects-container">
-
-          {projects.map((project, index) => (
-
+          {loading && (
             <div
-              className="project-card"
-              key={index}
+              style={{
+                textAlign: "center",
+                padding: "60px 20px",
+                backgroundColor: "#ffffff",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                color: "#64748b",
+                fontSize: "18px",
+              }}
             >
+              Loading your projects from database...
+            </div>
+          )}
 
-              <button className="more-button">
-                ⋮
-              </button>
-
-              {/* LEFT SIDE */}
-
-              <div className="project-left">
-
-                <div
-                  className="project-icon-box"
+          {!loading && projectsToDisplay.length === 0 && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "60px 20px",
+                backgroundColor: "#ffffff",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                border: "1px dashed #cbd5e1",
+              }}
+            >
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>📁</div>
+              <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 8px" }}>
+                No projects enrolled yet
+              </h2>
+              <p style={{ fontSize: "16px", color: "#64748b", margin: "0 0 24px" }}>
+                You haven't enrolled in any projects yet. Browse available projects and enroll to collaborate!
+              </p>
+              <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+                <button
+                  type="button"
+                  onClick={() => navigate("/projects")}
                   style={{
-                    backgroundColor:
-                      project.iconBackground,
+                    padding: "12px 24px",
+                    backgroundColor: "#2f80bd",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
                   }}
                 >
-                  {project.icon}
-                </div>
+                  Browse Available Projects
+                </button>
+              </div>
+            </div>
+          )}
 
-                <div className="project-content">
-
-                  <h2>
-                    {project.title}
-                  </h2>
-
-                  <p className="project-description">
-                    {project.description}
-                  </p>
-
-                  <div className="members-row">
-
-                    <div className="member-circle">
-                      👤
+          {!loading &&
+            projectsToDisplay.map((project, index) => {
+              const membersCount = project.members ? project.members.length : 0;
+              return (
+                <div
+                  className="project-card"
+                  key={project._id || index}
+                >
+                  {/* LEFT SIDE */}
+                  <div className="project-left">
+                    <div
+                      className="project-icon-box"
+                      style={{
+                        backgroundColor: project.iconBackground,
+                      }}
+                    >
+                      {project.icon}
                     </div>
 
-                    <div className="member-circle">
-                      👤
+                    <div className="project-content">
+                      <h2>{project.name}</h2>
+                      <p className="project-description">
+                        {project.description || "No project description provided."}
+                      </p>
+
+                      <div className="members-row">
+                        {membersCount > 0 ? (
+                          <>
+                            {project.members.slice(0, 3).map((m: any, mIdx: number) => {
+                              const name = typeof m === "string" ? m : m.name || m.username || "M";
+                              return (
+                                <div
+                                  key={mIdx}
+                                  className="member-circle"
+                                  title={name}
+                                  style={{ color: "#ffffff", fontSize: "12px", fontWeight: "bold" }}
+                                >
+                                  {name.charAt(0).toUpperCase()}
+                                </div>
+                              );
+                            })}
+                            <span className="member-count">
+                              {membersCount} {membersCount === 1 ? "Member" : "Members"}
+                            </span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: "14px", color: "#64748b" }}>
+                            0 Members
+                          </span>
+                        )}
+                      </div>
                     </div>
-
-                    <span className="member-count">
-                      +2
-                    </span>
-
                   </div>
 
+                  {/* RIGHT SIDE */}
+                  <div className="project-right">
+                    <button
+                      className="view-project-button"
+                      type="button"
+                      onClick={() => navigate(`/view-project?id=${project._id}`)}
+                    >
+                      View Project
+                    </button>
+
+                    <button
+                      className="arrow-button"
+                      type="button"
+                      style={{ border: "none", background: "none", cursor: "pointer", font: "inherit" }}
+                      onClick={() => navigate(`/view-project?id=${project._id}`)}
+                    >
+                      →
+                    </button>
+                  </div>
                 </div>
-
-              </div>
-
-              {/* RIGHT SIDE */}
-
-              <div className="project-right">
-
-                <button className="view-project-button">
-                  View Project
-                </button>
-
-                <span className="arrow-button">
-                  →
-                </span>
-
-              </div>
-
-            </div>
-
-          ))}
-
+              );
+            })}
         </div>
 
       </main>
