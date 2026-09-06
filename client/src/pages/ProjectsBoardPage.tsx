@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NavigationBar from "../components/NavigationBar";
 import { getProjects, type Project } from "../services/projectService";
 
 function ProjectsBoardPage() {
@@ -466,7 +467,7 @@ function ProjectsBoardPage() {
 
           .table-header,
           .project-row {
-            min-width: 1000px;
+            min-width: 780px;
           }
         }
 
@@ -522,7 +523,7 @@ function ProjectsBoardPage() {
 
           .table-header,
           .project-row {
-            min-width: 1000px;
+            min-width: 780px;
           }
         }
 
@@ -532,61 +533,7 @@ function ProjectsBoardPage() {
 
         {/* TOP NAVBAR */}
 
-        <header className="top-navbar">
-
-          <div className="brand">
-            <div className="logo-icon"></div>
-
-            <span className="brand-name">
-              CollabBoard
-            </span>
-          </div>
-
-          <nav className="nav-links">
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/dashboard")}
-            >
-              Dashboard
-            </button>
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/projects")}
-            >
-              All Projects
-            </button>
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/my-projects")}
-            >
-              My Projects
-            </button>
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/create-project")}
-            >
-              Create Project
-            </button>
-
-            <button
-              className="nav-link"
-              onClick={() => navigate("/project")}
-            >
-              My Project
-            </button>
-
-          </nav>
-
-          <div
-            className="profile-icon"
-            onClick={() => navigate("/profile")}
-          ></div>
-
-        </header>
+        <NavigationBar />
 
         {/* MAIN CONTENT */}
 
@@ -619,87 +566,95 @@ function ProjectsBoardPage() {
           </div>
 
           {/* PROJECT TABLE */}
+          <div className="responsive-table-wrapper">
+            <div className="projects-table">
+              <div className="table-header">
+                <span>Project</span>
+                <span>Description</span>
+                <span>Status</span>
+                <span>Members</span>
+                <span>Action</span>
+              </div>
 
-          <div className="projects-table">
-
-            <div className="table-header">
-
-              <span>Project</span>
-
-              <span>Description</span>
-
-              <span>Status</span>
-
-              <span>Members</span>
-
-              <span>Action</span>
-
-            </div>
-
-            {loading && (
-              <p className="message">
-                Loading projects...
-              </p>
-            )}
-
-            {error && (
-              <p className="message error-message">
-                {error}
-              </p>
-            )}
-
-            {!loading &&
-              !error &&
-              filteredProjects.length === 0 && (
+              {loading && (
                 <p className="message">
-                  {searchTerm
-                    ? "No projects found."
-                    : "No projects available."}
+                  Loading projects...
                 </p>
               )}
 
-            {!loading &&
-              !error &&
-              filteredProjects.map((project) => (
+              {error && (
+                <p className="message error-message">
+                  {error}
+                </p>
+              )}
 
-                <div
-                  className="project-row"
-                  key={project.id}
-                >
+              {!loading &&
+                !error &&
+                filteredProjects.length === 0 && (
+                  <p className="message">
+                    {searchTerm
+                      ? "No projects found."
+                      : "No projects available."}
+                  </p>
+                )}
 
-                  <span className="project-name">
-                    {project.name}
-                  </span>
-
-                  <span className="project-description">
-                    {project.description}
-                  </span>
-
-                  <span className="project-status">
-
-                    <span className="status-dot"></span>
-
-                    {project.status}
-
-                  </span>
-
-                  <span className="project-members">
-                    {project.members.join(", ")}
-                  </span>
-
-                  <button
-                    className="view-project-button"
-                    onClick={() =>
-                      navigate(`/view-project?id=${project.id}`)
-                    }
+              {!loading &&
+                !error &&
+                filteredProjects.map((project) => (
+                  <div
+                    className="project-row"
+                    key={project._id || project.id}
                   >
-                    View Project
-                  </button>
+                    <span className="project-name">
+                      {project.name}
+                    </span>
 
-                </div>
+                    <span className="project-description">
+                      {project.description}
+                    </span>
 
-              ))}
+                    <span className="project-status">
+                      <span
+                        className="status-dot"
+                        style={{
+                          backgroundColor: project.isClosed
+                            ? "#ef4444"
+                            : project.status === "DONE"
+                            ? "#10b981"
+                            : project.status === "SUBMITTED"
+                            ? "#3b82f6"
+                            : (project.members?.length || 0) >= (project.requiredMembers || 3)
+                            ? "#f59e0b"
+                            : "#0ea5e9",
+                        }}
+                      ></span>
+                      {project.isClosed
+                        ? "Closed"
+                        : project.status === "DONE"
+                        ? "Done (Approved)"
+                        : project.status === "SUBMITTED"
+                        ? "Submitted"
+                        : (project.members?.length || 0) >= (project.requiredMembers || 3)
+                        ? "Doing (Started)"
+                        : "To Do (Filling)"}
+                    </span>
 
+                    <span className="project-members">
+                      {Array.isArray(project.members) ? project.members.length : 0} /{" "}
+                      {project.requiredMembers || 3} Enrolled
+                    </span>
+
+                    <button
+                      className="view-project-button"
+                      onClick={() =>
+                        navigate(`/view-project?id=${project._id || project.id}`)
+                      }
+                    >
+                      View Project
+                    </button>
+                  </div>
+                ))}
+            </div>
           </div>
 
         </main>
