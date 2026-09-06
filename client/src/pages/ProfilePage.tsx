@@ -1,4 +1,11 @@
+import { useNavigate } from "react-router-dom";
+import NavigationBar from "../components/NavigationBar";
+import { useAuth } from "../context/AuthContext";
+import { formatDate } from "../types";
+
 function ProfilePage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   return (
     <>
       <style>{`
@@ -178,6 +185,7 @@ function ProfilePage() {
           display: block;
 
           width: 250px;
+          max-width: 100%;
 
           margin: 38px auto;
 
@@ -311,29 +319,7 @@ function ProfilePage() {
         }
       `}</style>
 
-      {/* =========================
-          NAVIGATION BAR
-      ========================= */}
-
-      <nav className="profile-navbar">
-
-        <div className="profile-logo">
-          <div className="profile-logo-icon">✓</div>
-          <span>CollabBoard</span>
-        </div>
-
-        <div className="profile-nav-links">
-          <a href="#">Dashboard</a>
-          <a href="#">Projects</a>
-          <a href="#">Members</a>
-          <a href="#">Tasks</a>
-        </div>
-
-        <div className="top-profile-icon">
-          👤
-        </div>
-
-      </nav>
+      <NavigationBar />
 
       {/* =========================
           PROFILE PAGE
@@ -362,12 +348,35 @@ function ProfilePage() {
           </div>
 
           <h2 className="profile-name">
-            Jane Doe
+            {user?.name || user?.username || "User"}
           </h2>
 
           <button className="role-button">
-            Project Member
+            {user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Project Member"}
           </button>
+
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <button
+              type="button"
+              onClick={() => navigate("/edit-profile")}
+              style={{
+                padding: "9px 20px",
+                backgroundColor: "#2563eb",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)",
+              }}
+            >
+              ✏️ Edit Profile
+            </button>
+          </div>
 
         </section>
 
@@ -380,22 +389,17 @@ function ProfilePage() {
 
             <div className="detail-row">
               <span className="detail-icon">✉</span>
-              <span>jane.doe@gmail.com</span>
+              <span>{user?.email || "No email registered"}</span>
             </div>
 
             <div className="detail-row">
-              <span className="detail-icon">☎</span>
-              <span>+94 77 123 4567</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-icon">⌖</span>
-              <span>Colombo,Sri Lanka</span>
+              <span className="detail-icon">👤</span>
+              <span>@{user?.username || "user"}</span>
             </div>
 
             <div className="detail-row">
               <span className="detail-icon">▣</span>
-              <span>Member since May 2024</span>
+              <span>Member since {user?.createdAt ? formatDate(user.createdAt) : "Recently"}</span>
             </div>
 
           </div>
